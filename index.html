@@ -4,25 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Futures Assessment Platform (FL & FC)</title>
-  <!-- Tailwind CSS & Chart.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- SheetJS voor parsing van Excel (.xlsx, .xls), ODS en CSV -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 
-  <!-- Header -->
   <header class="bg-indigo-700 text-white py-4 shadow-md sticky top-0 z-50">
     <div class="max-w-4xl mx-auto px-4 flex justify-between items-center">
       <div>
         <h1 class="text-xl font-bold tracking-tight">Kijk op de Toekomst</h1>
-        <p class="text-indigo-200 text-xs">Futures Literacy & Consciousness Assessment</p>
+        <p class="text-indigo-200 text-xs">Futures Literacy & Consciousness Platform</p>
       </div>
       <div class="flex items-center space-x-2">
         <button onclick="startNewSession()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-semibold">
-          Nieuwe Test
-        </button>
-        <button id="nav-my-result-btn" onclick="showMyLastResult()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded text-xs font-semibold hidden">
-          Mijn Resultaat
+          Home / Start
         </button>
         <button onclick="promptAdminLogin()" class="px-3 py-1.5 bg-slate-900/40 hover:bg-slate-900/60 border border-indigo-300/30 rounded text-xs font-semibold">
           Beheerder
@@ -33,33 +30,48 @@
 
   <main class="max-w-4xl mx-auto p-4 sm:p-6">
     
-    <!-- STAP 1: ONBOARDING & KEUZEMENU -->
+    <!-- STAP 1: KEUZE SECTIE EN GEBRUIKER UIT DATABASE -->
     <section id="step1-view" class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-slate-200 max-w-xl mx-auto">
-      <h2 class="text-xl font-bold text-slate-800 mb-2">Welkom bij het Toekomstonderzoek</h2>
+      <h2 class="text-xl font-bold text-slate-800 mb-2">Aanmelden voor de Test</h2>
       <p class="text-sm text-slate-600 mb-6">
-        Vul je gegevens in en selecteer welke vragenlijst je gaat invullen.
+        Selecteer eerst je groep en zoek vervolgens je naam in de lijst.
       </p>
 
-      <form id="onboarding-form" onsubmit="handleStartTest(event)" class="space-y-4">
+      <div id="loading-users-indicator" class="text-center py-4 text-sm text-slate-500">
+        Gebruikerslijst inladen...
+      </div>
+
+      <form id="onboarding-form" onsubmit="handleStartTest(event)" class="space-y-4 hidden">
         <div>
-          <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Naam of Deelnemer-ID</label>
-          <input type="text" id="input-name" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="bv. Sam of Leerling 14">
+          <label class="block text-xs font-bold uppercase text-slate-500 mb-1">1. Kies je groep (Section)</label>
+          <select id="select-section" onchange="onSectionChanged()" required class="w-full border rounded-lg p-2.5 text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="">-- Selecteer eerst een groep --</option>
+          </select>
         </div>
 
         <div>
-          <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Klas of Groepscode</label>
-          <input type="text" id="input-group" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="bv. 4Wetenschappen of Workshop-Gent">
+          <label class="block text-xs font-bold uppercase text-slate-500 mb-1">2. Kies je naam (User)</label>
+          <select id="select-user" onchange="onUserSelected()" required disabled class="w-full border rounded-lg p-2.5 text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-slate-200">
+            <option value="">-- Kies eerst een groep hierboven --</option>
+          </select>
+        </div>
+
+        <!-- Knop voor historiek van deze gebruiker -->
+        <div id="user-history-btn-container" class="hidden text-right">
+          <button type="button" onclick="loadUserHistoryView()" class="text-xs text-indigo-600 hover:underline font-semibold">
+            Bekijk mijn eerdere resultaten &rarr;
+          </button>
         </div>
 
         <div class="pt-2">
-          <label class="block text-xs font-bold uppercase text-slate-500 mb-2">Kies de vragenlijst:</label>
+          <label class="block text-xs font-bold uppercase text-slate-500 mb-2">3. Kies de test:</label>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label class="border rounded-xl p-3.5 cursor-pointer hover:border-indigo-500 flex flex-col justify-between transition bg-slate-50 hover:bg-indigo-50/40">
               <div class="flex items-center gap-2 mb-2">
                 <input type="radio" name="test-choice" value="FL" checked class="accent-indigo-600">
                 <span class="font-bold text-sm text-slate-800">Toekomstgeletterdheid</span>
               </div>
-              <p class="text-xs text-slate-500"><strong>Futures Literacy:</strong> meet wat je <em>actief doet en kunt</em> met de toekomst (competenties).</p>
+              <p class="text-xs text-slate-500"><strong>Futures Literacy:</strong> wat je <em>actief kunt en doet</em> (competenties)[cite: 1, 2].</p>
             </label>
 
             <label class="border rounded-xl p-3.5 cursor-pointer hover:border-indigo-500 flex flex-col justify-between transition bg-slate-50 hover:bg-indigo-50/40">
@@ -67,7 +79,7 @@
                 <input type="radio" name="test-choice" value="FC" class="accent-indigo-600">
                 <span class="font-bold text-sm text-slate-800">Toekomstbewustzijn</span>
               </div>
-              <p class="text-xs text-slate-500"><strong>Futures Consciousness:</strong> meet hoe je <em>persoonlijk staat</em> tegenover de toekomst (houding en visie).</p>
+              <p class="text-xs text-slate-500"><strong>Futures Consciousness:</strong> je <em>houding en visie</em> op later (disposities)[cite: 1, 3].</p>
             </label>
           </div>
         </div>
@@ -78,6 +90,34 @@
       </form>
     </section>
 
+    <!-- HISTORIEK OVERZICHT GEBRUIKER -->
+    <section id="user-history-view" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <div class="flex justify-between items-center mb-4 border-b pb-3">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800" id="history-user-title">Jouw afgelegde testen</h2>
+          <p class="text-xs text-slate-500">Overzicht van al je eerdere inzendingen</p>
+        </div>
+        <button onclick="showView('step1-view')" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:underline">
+          &larr; Terug
+        </button>
+      </div>
+
+      <div class="overflow-x-auto border rounded-lg mb-4">
+        <table class="min-w-full text-left text-xs">
+          <thead class="bg-slate-100 uppercase text-slate-600 font-bold border-b">
+            <tr>
+              <th class="p-2.5">Type Test</th>
+              <th class="p-2.5">Datum</th>
+              <th class="p-2.5">Tijdstip</th>
+              <th class="p-2.5 text-center">Gemiddelde</th>
+              <th class="p-2.5 text-right">Actie</th>
+            </tr>
+          </thead>
+          <tbody id="user-history-tbody" class="divide-y text-slate-700"></tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- STAP 2: VRAGENLIJST (GERANDOMISEERD) -->
     <section id="quiz-view" class="hidden bg-white p-5 sm:p-7 rounded-xl shadow-sm border border-slate-200">
       <div class="flex justify-between items-start mb-6 border-b pb-4">
@@ -86,14 +126,14 @@
           <h2 id="quiz-title" class="text-xl font-bold text-slate-800 mt-1">Vragenlijst</h2>
           <p id="quiz-instructions" class="text-xs sm:text-sm text-slate-600 mt-1"></p>
         </div>
-        <button onclick="startNewSession()" class="text-xs text-slate-400 hover:text-slate-600">Wijzig keuze</button>
+        <button onclick="startNewSession()" class="text-xs text-slate-400 hover:text-slate-600">Annuleren</button>
       </div>
 
       <form id="quiz-form" onsubmit="submitQuiz(event)" class="space-y-4">
         <div id="quiz-container" class="space-y-3"></div>
 
         <button type="submit" id="quiz-submit-btn" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow transition mt-6">
-          Verstuur Antwoorden & Toon Mijn Profiel &rarr;
+          Verstuur Antwoorden & Toon Resultaat &rarr;
         </button>
       </form>
     </section>
@@ -117,7 +157,7 @@
       <div id="dimension-feedback" class="space-y-3 mt-4"></div>
     </section>
 
-    <!-- STAP 4: ADMINISTRATOR DASHBOARD -->
+    <!-- STAP 4: ADMINISTRATOR DASHBOARD MET BESTANDSUPLOAD -->
     <section id="admin-view" class="hidden bg-white p-5 sm:p-7 rounded-xl shadow-sm border border-slate-200">
       <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 border-b pb-4 gap-4">
         <div>
@@ -125,47 +165,60 @@
             <h2 class="text-xl font-bold text-slate-800">Beheerdersdashboard</h2>
             <span class="bg-amber-100 text-amber-800 text-[11px] px-2 py-0.5 rounded font-bold">Beveiligde Modus</span>
           </div>
-          <p class="text-xs text-slate-500">Centrale data uit database (per schaal en cohort)</p>
+          <p class="text-xs text-slate-500">Gebruikersbeheer en cohortanalyses</p>
         </div>
         
         <div class="flex flex-wrap items-center gap-2">
-          <div>
-            <label class="text-[10px] font-bold uppercase text-slate-400 block">Schaal</label>
-            <select id="admin-type-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-slate-50 font-medium">
-              <option value="FL">Futures Literacy (FL)</option>
-              <option value="FC">Futures Consciousness (FC)</option>
-            </select>
-          </div>
+          <button onclick="exportToCSV()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">
+            Exporteer Data
+          </button>
+          <button onclick="logoutAdmin()" class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs font-medium">
+            Uitloggen
+          </button>
+        </div>
+      </div>
 
-          <div>
-            <label class="text-[10px] font-bold uppercase text-slate-400 block">Groep</label>
-            <select id="admin-group-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-slate-50 font-medium">
-              <option value="ALL">Alle groepen</option>
-            </select>
-          </div>
+      <!-- GEBRUIKERS OPLADEN BOX -->
+      <div class="mb-8 p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl">
+        <h3 class="font-bold text-sm text-indigo-950 mb-1">Geregistreerde gebruikers importeren</h3>
+        <p class="text-xs text-slate-600 mb-3">
+          Upload een bestand (<strong>.csv, .xlsx, .xls, of .ods</strong>) met de kolommen: <code>User</code>, <code>ID</code> en <code>Section</code>.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center gap-3">
+          <input type="file" id="user-file-input" accept=".csv, .xlsx, .xls, .ods" class="text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+          <button onclick="handleFileUpload()" id="upload-btn" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-bold w-full sm:w-auto">
+            Opladen & Opslaan in Database
+          </button>
+        </div>
+        <div id="upload-status" class="text-xs mt-2 font-medium"></div>
+      </div>
 
-          <div class="flex items-end space-x-1 pt-3 sm:pt-0">
-            <button onclick="fetchAdminData()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 border rounded text-xs font-semibold">
-              Ververs
-            </button>
-            <button onclick="exportToCSV()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">
-              Exporteer CSV
-            </button>
-            <button onclick="logoutAdmin()" class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs">
-              Uitloggen
-            </button>
-          </div>
+      <!-- FILTERS -->
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div>
+          <label class="text-[10px] font-bold uppercase text-slate-400 block">Filter Schaal</label>
+          <select id="admin-type-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-slate-50 font-medium">
+            <option value="FL">Futures Literacy (FL)</option>
+            <option value="FC">Futures Consciousness (FC)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold uppercase text-slate-400 block">Filter Groep (Section)</label>
+          <select id="admin-group-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-slate-50 font-medium">
+            <option value="ALL">Alle groepen</option>
+          </select>
         </div>
       </div>
 
       <!-- KPI statistieken -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <div class="bg-slate-50 border rounded-lg p-3 text-center">
-          <div class="text-[11px] uppercase font-bold text-slate-400">Deelnemers</div>
+          <div class="text-[11px] uppercase font-bold text-slate-400">Afnames</div>
           <div id="stat-count" class="text-xl font-bold text-indigo-700">0</div>
         </div>
         <div class="bg-slate-50 border rounded-lg p-3 text-center">
-          <div class="text-[11px] uppercase font-bold text-slate-400">Cohortsneeuw</div>
+          <div class="text-[11px] uppercase font-bold text-slate-400">Gemiddelde</div>
           <div id="stat-avg" class="text-xl font-bold text-indigo-700">0.0</div>
         </div>
         <div class="bg-slate-50 border rounded-lg p-3 text-center">
@@ -178,7 +231,7 @@
         </div>
       </div>
 
-      <!-- Cohort Bar Chart -->
+      <!-- Bar Chart -->
       <div class="w-full max-w-xl mx-auto mb-8">
         <canvas id="adminBarChart"></canvas>
       </div>
@@ -189,13 +242,14 @@
           <thead class="bg-slate-100 uppercase text-slate-600 font-bold border-b">
             <tr>
               <th class="p-2.5">Deelnemer</th>
+              <th class="p-2.5">ID</th>
               <th class="p-2.5">Groep</th>
-              <th class="p-2.5">Schaal</th>
+              <th class="p-2.5">Datum & Tijd</th>
               <th class="p-2.5 text-center">Tijd</th>
               <th class="p-2.5 text-center">Agency</th>
-              <th class="p-2.5 text-center">Openheid / Reframing</th>
+              <th class="p-2.5 text-center">Openheid</th>
               <th class="p-2.5 text-center">Systeem</th>
-              <th class="p-2.5 text-center">Ethiek / Anderen</th>
+              <th class="p-2.5 text-center">Ethiek</th>
               <th class="p-2.5 text-center">Gem.</th>
               <th class="p-2.5 text-right">Detail</th>
             </tr>
@@ -208,24 +262,22 @@
   </main>
 
   <script>
-    // State variabelen
+    let registeredUsers = [];
     let isAdminAuthenticated = false;
     let adminToken = "";
     let cachedAdminSubmissions = [];
 
     let currentSession = {
-      userName: "",
-      groupId: "",
+      user: null,
       testType: "FL"
     };
 
     let radarChartInstance = null;
     let barChartInstance = null;
 
-    // Domein definities voor visualisatie & feedback
     const domainDefinitions = {
       FL: {
-        temporal: { name: "Temporele Geletterdheid", desc: "Doelgericht handelen naar open toekomsten en oude routines durven doorbreken." },
+        temporal: { name: "Temporele Geletterdheid", desc: "Doelgericht handelen naar open toekomsten en oude routines doorbreken." },
         agency: { name: "Anticipatorisch Vermogen", desc: "Kiezen tussen plannen of experimenteren, en doelgericht handelen bij onzekerheid." },
         reframing: { name: "Verbeeldingskracht & Reframing", desc: "Dominante ideeën overhoop halen met provocatieve 'wat-als'-vragen." },
         systems: { name: "Systeemdenken", desc: "Kettingreacties en neveneffecten actief onderzoeken voor je handelt." },
@@ -240,7 +292,6 @@
       }
     };
 
-    // ITEM DATASETS
     // 1. Actieve B1 Futures Literacy Items
     const itemsFL = [
       { id: "FL_TP_01", domain: "temporal", text: "Als ik plannen maak, check ik bewust of ik niet gewoon oude gewoontes zit te herhalen." },
@@ -260,7 +311,7 @@
       { id: "FL_CO_03", domain: "ethics", text: "Ik verander mijn huidige keuzes zodanig dat mensen die na ons komen er later geen schade van ondervinden." }
     ];
 
-    // 2. Gevalideerde Futures Consciousness Items (Lalot et al., 2024 - Tabel 3)
+    // 2. Gevalideerde Futures Consciousness Items (Lalot et al., 2024)[cite: 3]
     const itemsFC = [
       { id: "FC_TP_01", domain: "temporal", text: "Ik denk na over hoe de toekomst er mogelijk uit gaat zien." },
       { id: "FC_TP_02", domain: "temporal", text: "Bij het maken van een beslissing denk ik na over hoe het mijn toekomst kan beïnvloeden." },
@@ -279,9 +330,8 @@
       { id: "FC_CO_03", domain: "ethics", text: "Ik probeer bij te dragen aan gelijkheid, rechtvaardigheid, duurzaamheid en een wereld zonder oorlog." }
     ];
 
-    // UI View Manager
     function showView(viewId) {
-      ['step1-view', 'quiz-view', 'result-view', 'admin-view'].forEach(id => {
+      ['step1-view', 'user-history-view', 'quiz-view', 'result-view', 'admin-view'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
       document.getElementById(viewId).classList.remove('hidden');
@@ -289,35 +339,130 @@
 
     function startNewSession() {
       showView('step1-view');
+      loadUsers();
     }
 
-    // Lokale opslag (enkel voor de deelnemer zelf)
-    function getUserHistory() {
-      return JSON.parse(localStorage.getItem('fl_user_history') || '{}');
-    }
+    // Geregistreerde gebruikers ophalen voor dropdowns
+    async function loadUsers() {
+      try {
+        const res = await fetch('/.netlify/functions/submissions/users');
+        registeredUsers = await res.json();
 
-    function updateMyResultButton() {
-      const history = getUserHistory();
-      const btn = document.getElementById('nav-my-result-btn');
-      if (Object.keys(history).length > 0) {
-        btn.classList.remove('hidden');
-      } else {
-        btn.classList.add('hidden');
+        const indicator = document.getElementById('loading-users-indicator');
+        const form = document.getElementById('onboarding-form');
+
+        if (!registeredUsers || registeredUsers.length === 0) {
+          indicator.innerText = "Er zijn nog geen geregistreerde gebruikers. Vraag de beheerder een lijst te uploaden.";
+          return;
+        }
+
+        indicator.classList.add('hidden');
+        form.classList.remove('hidden');
+
+        // Unieke secties bepalen
+        const sections = [...new Set(registeredUsers.map(u => u.section))].sort();
+        const sectionSelect = document.getElementById('select-section');
+        sectionSelect.innerHTML = '<option value="">-- Kies een groep (Section) --</option>' +
+          sections.map(s => `<option value="${s}">${s}</option>`).join('');
+
+        document.getElementById('select-user').innerHTML = '<option value="">-- Kies eerst een groep --</option>';
+        document.getElementById('select-user').disabled = true;
+        document.getElementById('user-history-btn-container').classList.add('hidden');
+      } catch (err) {
+        document.getElementById('loading-users-indicator').innerText = "Fout bij ophalen van gebruikers: " + err.message;
       }
     }
 
-    // Stap 1: Onboarding
+    function onSectionChanged() {
+      const selectedSection = document.getElementById('select-section').value;
+      const userSelect = document.getElementById('select-user');
+      document.getElementById('user-history-btn-container').classList.add('hidden');
+
+      if (!selectedSection) {
+        userSelect.innerHTML = '<option value="">-- Kies eerst een groep --</option>';
+        userSelect.disabled = true;
+        return;
+      }
+
+      const usersInSection = registeredUsers
+        .filter(u => u.section === selectedSection)
+        .sort((a,b) => a.user.localeCompare(b.user));
+
+      userSelect.innerHTML = '<option value="">-- Kies jouw naam --</option>' +
+        usersInSection.map(u => `<option value="${u.studentId}">${u.user} (${u.studentId})</option>`).join('');
+      userSelect.disabled = false;
+    }
+
+    function onUserSelected() {
+      const studentId = document.getElementById('select-user').value;
+      const btnContainer = document.getElementById('user-history-btn-container');
+      if (studentId) {
+        btnContainer.classList.remove('hidden');
+      } else {
+        btnContainer.classList.add('hidden');
+      }
+    }
+
+    // Historiek van de gebruiker bekijken
+    async function loadUserHistoryView() {
+      const studentId = document.getElementById('select-user').value;
+      const userObj = registeredUsers.find(u => u.studentId === studentId);
+      if (!userObj) return;
+
+      document.getElementById('history-user-title').innerText = `Afgelegde testen van ${userObj.user}`;
+      const tbody = document.getElementById('user-history-tbody');
+      tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-400">Resultaten ophalen...</td></tr>';
+      showView('user-history-view');
+
+      try {
+        const res = await fetch(`/.netlify/functions/submissions/user-history/${encodeURIComponent(studentId)}`);
+        const history = await res.json();
+
+        if (history.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-400">Je hebt nog geen eerdere testen afgelegd.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = history.map(item => {
+          const rowAvg = (Object.values(item.scores).reduce((a,b)=>a+b,0) / 5).toFixed(2);
+          const typeName = item.testType === 'FL' ? 'Toekomstgeletterdheid' : 'Toekomstbewustzijn';
+          return `
+            <tr class="hover:bg-slate-50">
+              <td class="p-2.5 font-bold ${item.testType === 'FL' ? 'text-indigo-700' : 'text-emerald-700'}">${typeName} (${item.testType})</td>
+              <td class="p-2.5 text-slate-600">${item.dateStr || ''}</td>
+              <td class="p-2.5 text-slate-600">${item.timeStr || ''}</td>
+              <td class="p-2.5 text-center font-bold text-slate-800">${rowAvg} / 5</td>
+              <td class="p-2.5 text-right">
+                <button onclick='renderRadar(${JSON.stringify(item)}, false)' class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded font-semibold text-xs">
+                  Bekijk Rapport
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-red-500">Fout: ${err.message}</td></tr>`;
+      }
+    }
+
+    // Starten van de quiz
     function handleStartTest(e) {
       e.preventDefault();
-      currentSession.userName = document.getElementById('input-name').value.trim();
-      currentSession.groupId = document.getElementById('input-group').value.trim();
+      const studentId = document.getElementById('select-user').value;
+      const userObj = registeredUsers.find(u => u.studentId === studentId);
+
+      if (!userObj) {
+        alert("Selecteer een geldige gebruiker.");
+        return;
+      }
+
+      currentSession.user = userObj;
       currentSession.testType = document.querySelector('input[name="test-choice"]:checked').value;
 
       buildQuiz();
       showView('quiz-view');
     }
 
-    // Stap 2: Vragenlijst willekeurig opbouwen
     function buildQuiz() {
       const isFL = currentSession.testType === "FL";
       const items = isFL ? itemsFL : itemsFC;
@@ -330,62 +475,28 @@
         : "Geef aan in hoeverre deze uitspraken waar zijn voor jou. <em>(1 = Niet waar voor mij &bull; 5 = Helemaal waar voor mij)</em>";
 
       const container = document.getElementById('quiz-container');
-      let html = '';
-      shuffled.forEach((q, idx) => {
-        html += `
-          <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
-            <div class="flex items-start gap-2 mb-2">
-              <span class="text-xs font-bold text-slate-400 mt-0.5">${idx + 1}.</span>
-              <span class="text-sm font-medium text-slate-800 leading-snug">${q.text}</span>
-            </div>
-            <div class="flex justify-between items-center pt-2 border-t border-slate-200 max-w-xs mx-auto sm:max-w-none sm:justify-end sm:gap-4">
-              <span class="text-[11px] text-slate-400">1</span>
-              <div class="flex gap-3 sm:gap-4 items-center">
-                ${[1,2,3,4,5].map(v => `
-                  <label class="cursor-pointer flex flex-col items-center">
-                    <input type="radio" name="${q.id}" value="${v}" required class="w-4 h-4 text-indigo-600 accent-indigo-600">
-                    <span class="text-[10px] text-slate-400 mt-0.5">${v}</span>
-                  </label>
-                `).join('')}
-              </div>
-              <span class="text-[11px] text-slate-400">5</span>
-            </div>
+      container.innerHTML = shuffled.map((q, idx) => `
+        <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200">
+          <div class="flex items-start gap-2 mb-2">
+            <span class="text-xs font-bold text-slate-400 mt-0.5">${idx + 1}.</span>
+            <span class="text-sm font-medium text-slate-800 leading-snug">${q.text}</span>
           </div>
-        `;
-      });
-      container.innerHTML = html;
+          <div class="flex justify-between items-center pt-2 border-t border-slate-200 max-w-xs mx-auto sm:max-w-none sm:justify-end sm:gap-4">
+            <span class="text-[11px] text-slate-400">1</span>
+            <div class="flex gap-3 sm:gap-4 items-center">
+              ${[1,2,3,4,5].map(v => `
+                <label class="cursor-pointer flex flex-col items-center">
+                  <input type="radio" name="${q.id}" value="${v}" required class="w-4 h-4 text-indigo-600 accent-indigo-600">
+                  <span class="text-[10px] text-slate-400 mt-0.5">${v}</span>
+                </label>
+              `).join('')}
+            </div>
+            <span class="text-[11px] text-slate-400">5</span>
+          </div>
+        </div>
+      `).join('');
     }
 
-    // Backend Netlify Function API: Opslaan via POST
-    async function saveSubmission(sub) {
-      try {
-        const res = await fetch('/.netlify/functions/submissions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sub)
-        });
-
-        if (!res.ok) throw new Error("Fout bij opslaan in database");
-        const savedData = await res.json();
-
-        // Bewaar eigen resultaat lokaal voor de deelnemer
-        const userHistory = getUserHistory();
-        userHistory[savedData.testType] = savedData;
-        localStorage.setItem('fl_user_history', JSON.stringify(userHistory));
-        updateMyResultButton();
-
-        return savedData;
-      } catch (err) {
-        console.warn("Netlify function niet bereikbaar of mislukt, val terug op lokale sessie:", err.message);
-        const userHistory = getUserHistory();
-        userHistory[sub.testType] = sub;
-        localStorage.setItem('fl_user_history', JSON.stringify(userHistory));
-        updateMyResultButton();
-        return sub;
-      }
-    }
-
-    // Quiz Indienen
     async function submitQuiz(e) {
       e.preventDefault();
       const submitBtn = document.getElementById('quiz-submit-btn');
@@ -409,32 +520,33 @@
         scores[k] = +(domainSums[k] / domainCounts[k]).toFixed(2);
       });
 
-      const submission = {
-        userName: currentSession.userName,
-        groupId: currentSession.groupId,
+      const payload = {
+        studentId: currentSession.user.studentId,
         testType: currentSession.testType,
         scores
       };
 
-      const finalSaved = await saveSubmission(submission);
-      renderRadar(finalSaved, false);
-      showView('result-view');
-      document.getElementById('quiz-form').reset();
-      submitBtn.disabled = false;
-      submitBtn.innerText = "Verstuur Antwoorden & Toon Mijn Profiel →";
+      try {
+        const res = await fetch('/.netlify/functions/submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error("Fout bij opslaan");
+        const savedData = await res.json();
+
+        renderRadar(savedData, false);
+        showView('result-view');
+        document.getElementById('quiz-form').reset();
+      } catch (err) {
+        alert("Fout bij het indienen: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Verstuur Antwoorden & Toon Resultaat →";
+      }
     }
 
-    // Eigen resultaat tonen
-    function showMyLastResult() {
-      const history = getUserHistory();
-      const keys = Object.keys(history);
-      if (keys.length === 0) return;
-      const latestType = keys[keys.length - 1];
-      renderRadar(history[latestType], false);
-      showView('result-view');
-    }
-
-    // Radardiagram renderen
     function renderRadar(sub, viewedByAdmin = false) {
       const keys = ["temporal", "agency", "reframing", "systems", "ethics"];
       const meta = domainDefinitions[sub.testType];
@@ -443,18 +555,15 @@
 
       const typeLabel = sub.testType === "FL" ? "Futures Literacy (Vaardigheden)" : "Futures Consciousness (Houding & Visie)";
       
-      document.getElementById('result-user-title').innerText = viewedByAdmin 
-        ? `${sub.userName} (${sub.groupId})` 
-        : `Jouw ${sub.testType}-Profiel: ${sub.userName}`;
-        
-      document.getElementById('result-user-subtitle').innerText = `${typeLabel}`;
+      document.getElementById('result-user-title').innerText = `${sub.userName} (${sub.section})`;
+      document.getElementById('result-user-subtitle').innerText = `${typeLabel} — Afgenomen op ${sub.dateStr} om ${sub.timeStr}`;
 
       const backBtn = document.getElementById('result-back-btn');
       if (viewedByAdmin) {
-        backBtn.innerText = "← Terug naar Beheer";
+        backBtn.innerText = "← Terug naar Beheerder";
         backBtn.onclick = () => showView('admin-view');
       } else {
-        backBtn.innerText = "← Nieuwe Sessie";
+        backBtn.innerText = "← Terug naar Start";
         backBtn.onclick = () => startNewSession();
       }
 
@@ -487,8 +596,7 @@
         }
       });
 
-      const container = document.getElementById('dimension-feedback');
-      container.innerHTML = keys.map(k => `
+      document.getElementById('dimension-feedback').innerHTML = keys.map(k => `
         <div class="p-3 border rounded-lg bg-slate-50 flex justify-between items-center">
           <div>
             <h4 class="font-bold text-xs sm:text-sm text-slate-800">${meta[k].name}</h4>
@@ -499,9 +607,12 @@
           </span>
         </div>
       `).join('');
+      showView('result-view');
     }
 
-    // Backend Netlify Function API: Beheerder Data ophalen via GET
+    // ------------------------------------------------------------------------
+    // ADMINISTRATOR LOGICA
+    // ------------------------------------------------------------------------
     async function promptAdminLogin() {
       if (isAdminAuthenticated) {
         showView('admin-view');
@@ -519,13 +630,13 @@
         showView('admin-view');
       } else {
         adminToken = "";
-        alert("Toegang geweigerd of serverfout.");
+        alert("Toegang geweigerd of verkeerd wachtwoord.");
       }
     }
 
     async function fetchAdminData() {
       try {
-        const res = await fetch('/.netlify/functions/submissions', {
+        const res = await fetch('/.netlify/functions/submissions/admin/submissions', {
           method: 'GET',
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
@@ -546,28 +657,96 @@
       isAdminAuthenticated = false;
       adminToken = "";
       cachedAdminSubmissions = [];
-      showView('step1-view');
+      startNewSession();
     }
 
-    // Admin Dashboard Renderen
+    // Opladen en parsen van CSV/Excel/ODS bestand
+    async function handleFileUpload() {
+      const fileInput = document.getElementById('user-file-input');
+      const statusDiv = document.getElementById('upload-status');
+      const uploadBtn = document.getElementById('upload-btn');
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Kies eerst een bestand (.csv, .xlsx, .xls of .ods).");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      statusDiv.className = "text-xs mt-2 text-indigo-600 font-medium";
+      statusDiv.innerText = "Bestand verwerken...";
+      uploadBtn.disabled = true;
+
+      try {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+        if (jsonData.length === 0) {
+          throw new Error("Het bestand bevat geen rijen.");
+        }
+
+        // Valideer vereiste kolommen
+        const firstRow = jsonData[0];
+        const keys = Object.keys(firstRow).map(k => k.trim().toLowerCase());
+        if (!keys.includes("user") || !keys.includes("id") || !keys.includes("section")) {
+          throw new Error("Het bestand moet exact de kolommen 'User', 'ID' en 'Section' bevatten.");
+        }
+
+        // Genormaliseerde lijst samenstellen
+        const cleanUsers = jsonData.map(row => {
+          let userVal = "", idVal = "", sectionVal = "";
+          for (const [k, v] of Object.entries(row)) {
+            const keyLower = k.trim().toLowerCase();
+            if (keyLower === "user") userVal = v;
+            if (keyLower === "id") idVal = v;
+            if (keyLower === "section") sectionVal = v;
+          }
+          return { User: userVal, ID: idVal, Section: sectionVal };
+        }).filter(u => u.User && u.ID && u.Section);
+
+        // Versturen naar de database
+        const res = await fetch('/.netlify/functions/submissions/admin/import-users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ users: cleanUsers })
+        });
+
+        if (!res.ok) throw new Error("Fout bij opslaan naar database");
+
+        const result = await res.json();
+        statusDiv.className = "text-xs mt-2 text-emerald-600 font-bold";
+        statusDiv.innerText = `Succesvol ${result.count} gebruikers geïmporteerd of bijgewerkt!`;
+        fileInput.value = "";
+      } catch (err) {
+        statusDiv.className = "text-xs mt-2 text-red-600 font-bold";
+        statusDiv.innerText = "Fout: " + err.message;
+      } finally {
+        uploadBtn.disabled = false;
+      }
+    }
+
     function renderAdminDashboard() {
       if (!isAdminAuthenticated) return;
 
       const currentType = document.getElementById('admin-type-filter').value;
       const typeFiltered = cachedAdminSubmissions.filter(s => s.testType === currentType);
 
-      const groups = [...new Set(typeFiltered.map(s => s.groupId))];
+      const groups = [...new Set(typeFiltered.map(s => s.section))].sort();
       const groupFilter = document.getElementById('admin-group-filter');
-      const prevSelectedGroup = groupFilter.value;
+      const prevSelected = groupFilter.value;
 
       groupFilter.innerHTML = '<option value="ALL">Alle groepen</option>' + 
         groups.map(g => `<option value="${g}">${g}</option>`).join('');
-      if (groups.includes(prevSelectedGroup)) groupFilter.value = prevSelectedGroup;
+      if (groups.includes(prevSelected)) groupFilter.value = prevSelected;
 
       const selectedGroup = groupFilter.value;
       const finalFiltered = selectedGroup === 'ALL'
         ? typeFiltered
-        : typeFiltered.filter(s => s.groupId === selectedGroup);
+        : typeFiltered.filter(s => s.section === selectedGroup);
 
       document.getElementById('stat-count').innerText = finalFiltered.length;
 
@@ -575,7 +754,7 @@
         document.getElementById('stat-avg').innerText = "0.0";
         document.getElementById('stat-strongest').innerText = "-";
         document.getElementById('stat-growth').innerText = "-";
-        document.getElementById('admin-table-body').innerHTML = '<tr><td colspan="10" class="p-4 text-center text-slate-400">Geen data gevonden voor deze selectie.</td></tr>';
+        document.getElementById('admin-table-body').innerHTML = '<tr><td colspan="11" class="p-4 text-center text-slate-400">Geen data beschikbaar.</td></tr>';
         if (barChartInstance) barChartInstance.destroy();
         return;
       }
@@ -617,20 +796,20 @@
 
       document.getElementById('admin-table-body').innerHTML = finalFiltered.map(s => {
         const rowAvg = (Object.values(s.scores).reduce((a,b)=>a+b,0) / keys.length).toFixed(2);
-        const id = s._id || s.id;
         return `
           <tr class="hover:bg-slate-50">
             <td class="p-2.5 font-semibold text-slate-800">${s.userName}</td>
-            <td class="p-2.5 text-slate-500">${s.groupId}</td>
-            <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.testType === 'FL' ? 'bg-indigo-100 text-indigo-800' : 'bg-emerald-100 text-emerald-800'}">${s.testType}</span></td>
+            <td class="p-2.5 text-slate-500">${s.studentId}</td>
+            <td class="p-2.5 text-slate-500">${s.section}</td>
+            <td class="p-2.5 text-slate-600 text-[11px]">${s.dateStr || ''} ${s.timeStr || ''}</td>
             <td class="p-2.5 text-center">${s.scores.temporal}</td>
             <td class="p-2.5 text-center">${s.scores.agency}</td>
             <td class="p-2.5 text-center">${s.scores.reframing}</td>
             <td class="p-2.5 text-center">${s.scores.systems}</td>
             <td class="p-2.5 text-center">${s.scores.ethics}</td>
-            <td class="p-2.5 text-center font-bold text-slate-800">${rowAvg}</td>
+            <td class="p-2.5 text-center font-bold text-indigo-700">${rowAvg}</td>
             <td class="p-2.5 text-right">
-              <button onclick="viewIndividualRecord('${id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-medium text-[11px]">
+              <button onclick='renderRadar(${JSON.stringify(s)}, true)' class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-medium text-[11px]">
                 Fiche
               </button>
             </td>
@@ -639,24 +818,16 @@
       }).join('');
     }
 
-    function viewIndividualRecord(id) {
-      const record = cachedAdminSubmissions.find(r => (r._id === id || r.id === id));
-      if (record) {
-        renderRadar(record, true);
-        showView('result-view');
-      }
-    }
-
     function exportToCSV() {
       if (cachedAdminSubmissions.length === 0) {
-        alert("Geen data beschikbaar om te exporteren.");
+        alert("Geen data om te exporteren.");
         return;
       }
 
-      let csv = "ID,Datum,Naam,Groep,Schaal,Temporeel,Agency,Reframing_Openheid,Systemen,Ethiek_Anderen,Gemiddelde\n";
+      let csv = "ID,Datum,Tijdstip,Student_ID,Naam,Groep,Schaal,Temporeel,Agency,Reframing_Openheid,Systemen,Ethiek_Anderen,Gemiddelde\n";
       cachedAdminSubmissions.forEach(s => {
         const rowAvg = (Object.values(s.scores).reduce((a,b)=>a+b,0) / 5).toFixed(2);
-        csv += `"${s._id || s.id}","${s.date || ''}","${s.userName}","${s.groupId}","${s.testType}",${s.scores.temporal},${s.scores.agency},${s.scores.reframing},${s.scores.systems},${s.scores.ethics},${rowAvg}\n`;
+        csv += `"${s._id || s.id}","${s.dateStr || ''}","${s.timeStr || ''}","${s.studentId}","${s.userName}","${s.section}","${s.testType}",${s.scores.temporal},${s.scores.agency},${s.scores.reframing},${s.scores.systems},${s.scores.ethics},${rowAvg}\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -669,7 +840,7 @@
     }
 
     window.onload = () => {
-      updateMyResultButton();
+      loadUsers();
     };
   </script>
 </body>
