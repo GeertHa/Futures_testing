@@ -3,7 +3,6 @@ const { MongoClient } = require("mongodb");
 const uri = process.env.MONGODB_URI;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin";
 
-// Hergebruik de database-connectie tussen verschillende aanroepen (caching)
 let cachedClient = null;
 
 async function connectToDatabase() {
@@ -22,7 +21,6 @@ exports.handler = async (event) => {
     "Content-Type": "application/json"
   };
 
-  // CORS preflight verzoek afhandelen
   if (event.httpMethod === "OPTIONS") {
     return { statusCode: 200, headers, body: "" };
   }
@@ -30,50 +28,99 @@ exports.handler = async (event) => {
   try {
     const client = await connectToDatabase();
     const db = client.db("futures_db");
-    const collection = db.collection("submissions");
+    const usersCol = db.collection("users");
+    const submissionsCol = db.collection("submissions");
 
-    // 1. DATA OPSLAAN (Voor elke deelnemer)
-    if (event.httpMethod === "POST") {
-      const data = JSON.parse(event.body);
-      
-      const document = {
-        userName: data.userName,
-        groupId: data.groupId,
-        testType: data.testType, // 'FL' of 'FC'
-        scores: data.scores,
-        date: new Date().toISOString()
-      };
+    const path = event.path.replace(/\/\.netlify\/functions\/submissions\/?/, "");
+    const authHeader = event.headers.authorization || "";
+    const token = authHeader.replace("Bearer ", "");
 
-      const result = await collection.insertOne(document);
-      return {
-        statusCode: 201,
-        headers,
-        body: JSON.stringify({ success: true, id: result.insertedId, ...document })
-      };
+    // ------------------------------------------------------------------------
+    // 1. ENDPOINTS VOOR REGULIERE GEBRUIKERS
+    // ------------------------------------------------------------------------
+
+    // A. Haal alle geregistreerde gebruikers op (voor de Section/User dropdowns)
+    if (event.httpMethod === "GET" && path === "users") {
+      const users = await usersCol.find({}, { projection: { user: 1, studentId: 1, section: 1 } }).toArray();
+      return { statusCode: 200, headers, body: JSON.stringify(users) };
     }
 
-    // 2. DATA OPHALEN (Alleen beheerder met wachtwoord)
-    if (event.httpMethod === "GET") {
-      const authHeader = event.headers.authorization || "";
-      const token = authHeader.replace("Bearer ", "");
+    // B. Haal alle testen van één specifieke gebruiker op
+    if (event.httpMethod === "GET" && path.startsWith("user-history/")) {
+      const studentId = decodeURIComponent(path.split("/")[1]);
+      const history = await submissionsCol.find({ studentId }).sort({ timestamp: -1 }).toArray();
+      return { statusCode: 200, headers, body: JSON.stringify(history) };
+    }
 
-      if (token !== ADMIN_PASSWORD) {
+    // C. Test opslaan
+    if (event.httpMethod === "POST" && (path === "" || path === "submit")) {
+      const data = JSON.parse(event.body);
+
+      // Controleer of de gebruiker geregistreerd is
+      const userExists = await usersCol.findOne({ studentId: data.studentId });
+      if (!userExists) {
         return {
-          statusCode: 401,
+          statusCode: 403,
           headers,
-          body: JSON.stringify({ error: "Niet geautoriseerd" })
+          body: JSON.stringify({ error: "Gebruiker niet geregistreerd." })
         };
       }
 
-      const submissions = await collection.find({}).sort({ date: -1 }).toArray();
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(submissions)
+      const now = new Date();
+      const document = {
+        studentId: data.studentId,
+        userName: userExists.user,
+        section: userExists.section,
+        testType: data.testType, // 'FL' of 'FC'
+        scores: data.scores,
+        timestamp: now.toISOString(),
+        dateStr: now.toLocaleDateString("nl-NL"),
+        timeStr: now.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })
       };
+
+      const res = await submissionsCol.insertOne(document);
+      return { statusCode: 201, headers, body: JSON.stringify({ success: true, id: res.insertedId, ...document }) };
     }
 
-    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
+    // ------------------------------------------------------------------------
+    // 2. ENDPOINTS VOOR DE ADMINISTRATOR
+    // ------------------------------------------------------------------------
+    if (token !== ADMIN_PASSWORD) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: "Niet geautoriseerd" }) };
+    }
+
+    // D. Gebruikers importeren vanuit CSV/Excel (upsert op studentId)
+    if (event.httpMethod === "POST" && path === "admin/import-users") {
+      const { users } = JSON.parse(event.body);
+      if (!Array.isArray(users) || users.length === 0) {
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Geen data aangeleverd" }) };
+      }
+
+      const operations = users.map(u => ({
+        updateOne: {
+          filter: { studentId: String(u.ID).trim() },
+          update: {
+            $set: {
+              user: String(u.User).trim(),
+              studentId: String(u.ID).trim(),
+              section: String(u.Section).trim()
+            }
+          },
+          upsert: true
+        }
+      }));
+
+      await usersCol.bulkWrite(operations);
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, count: users.length }) };
+    }
+
+    // E. Alle submissions ophalen voor het admin dashboard
+    if (event.httpMethod === "GET" && (path === "" || path === "admin/submissions")) {
+      const submissions = await submissionsCol.find({}).sort({ timestamp: -1 }).toArray();
+      return { statusCode: 200, headers, body: JSON.stringify(submissions) };
+    }
+
+    return { statusCode: 404, headers, body: JSON.stringify({ error: "Endpoint niet gevonden" }) };
   } catch (error) {
     return {
       statusCode: 500,
