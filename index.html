@@ -6,7 +6,6 @@
   <title>Futures Assessment Platform (FL & FC)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- SheetJS voor parsing van Excel (.xlsx, .xls), ODS en CSV -->
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen">
@@ -30,7 +29,7 @@
 
   <main class="max-w-4xl mx-auto p-4 sm:p-6">
     
-    <!-- STAP 1: KEUZE SECTIE EN GEBRUIKER UIT DATABASE -->
+    <!-- STAP 1: KEUZE SECTIE EN GEBRUIKER -->
     <section id="step1-view" class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-slate-200 max-w-xl mx-auto">
       <h2 class="text-xl font-bold text-slate-800 mb-2">Aanmelden voor de Test</h2>
       <p class="text-sm text-slate-600 mb-6">
@@ -56,7 +55,6 @@
           </select>
         </div>
 
-        <!-- Knop voor historiek van deze gebruiker -->
         <div id="user-history-btn-container" class="hidden text-right">
           <button type="button" onclick="loadUserHistoryView()" class="text-xs text-indigo-600 hover:underline font-semibold">
             Bekijk mijn eerdere resultaten &rarr;
@@ -71,7 +69,7 @@
                 <input type="radio" name="test-choice" value="FL" checked class="accent-indigo-600">
                 <span class="font-bold text-sm text-slate-800">Toekomstgeletterdheid</span>
               </div>
-              <p class="text-xs text-slate-500"><strong>Futures Literacy:</strong> wat je <em>actief kunt en doet</em> (competenties)[cite: 1, 2].</p>
+              <p class="text-xs text-slate-500"><strong>Futures Literacy (FL):</strong> hoe bewust je omgaat met toekomstbeelden (15 items + 5 controle-items).</p>
             </label>
 
             <label class="border rounded-xl p-3.5 cursor-pointer hover:border-indigo-500 flex flex-col justify-between transition bg-slate-50 hover:bg-indigo-50/40">
@@ -79,7 +77,7 @@
                 <input type="radio" name="test-choice" value="FC" class="accent-indigo-600">
                 <span class="font-bold text-sm text-slate-800">Toekomstbewustzijn</span>
               </div>
-              <p class="text-xs text-slate-500"><strong>Futures Consciousness:</strong> je <em>houding en visie</em> op later (disposities)[cite: 1, 3].</p>
+              <p class="text-xs text-slate-500"><strong>Futures Consciousness (FC):</strong> je persoonlijke houding en oriëntatie tegenover later (15 items).</p>
             </label>
           </div>
         </div>
@@ -138,7 +136,7 @@
       </form>
     </section>
 
-    <!-- STAP 3: INDIVIDUEEL RESULTAAT -->
+    <!-- STAP 3: INDIVIDUEEL RESULTAAT MET DUBBELE RADAR LIJN -->
     <section id="result-view" class="hidden bg-white p-5 sm:p-7 rounded-xl shadow-sm border border-slate-200">
       <div class="flex justify-between items-center mb-4 border-b pb-3">
         <div>
@@ -150,14 +148,26 @@
         </button>
       </div>
 
-      <div class="w-full max-w-md mx-auto my-6">
+      <!-- Toelichting bij de dubbele lijn (enkel bij FL) -->
+      <div id="fl-radar-legend-info" class="hidden bg-slate-50 border p-3 rounded-lg text-xs text-slate-600 mb-4 leading-relaxed">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="inline-block w-3.5 h-3.5 bg-indigo-600 rounded"></span>
+          <strong class="text-indigo-950">Toekomstgeletterdheid (Direct):</strong> Hoger = sterker ontwikkeld vermogen om met open toekomsten te werken.
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-3.5 h-0.5 border-b-2 border-dashed border-amber-600"></span>
+          <strong class="text-amber-950">Schijnzekerheid / Starheid (Controlevragen):</strong> Lager = beter (toont aan dat je beseft dat de toekomst open en onzeker is).
+        </div>
+      </div>
+
+      <div class="w-full max-w-lg mx-auto my-6">
         <canvas id="userRadarChart"></canvas>
       </div>
 
       <div id="dimension-feedback" class="space-y-3 mt-4"></div>
     </section>
 
-    <!-- STAP 4: ADMINISTRATOR DASHBOARD MET BESTANDSUPLOAD -->
+    <!-- STAP 4: ADMINISTRATOR DASHBOARD -->
     <section id="admin-view" class="hidden bg-white p-5 sm:p-7 rounded-xl shadow-sm border border-slate-200">
       <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 border-b pb-4 gap-4">
         <div>
@@ -178,16 +188,16 @@
         </div>
       </div>
 
-      <!-- GEBRUIKERS OPLADEN BOX -->
+      <!-- GEBRUIKERS OPLADEN -->
       <div class="mb-8 p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl">
         <h3 class="font-bold text-sm text-indigo-950 mb-1">Geregistreerde gebruikers importeren</h3>
         <p class="text-xs text-slate-600 mb-3">
-          Upload een bestand (<strong>.csv, .xlsx, .xls, of .ods</strong>) met de kolommen: <code>User</code>, <code>ID</code> en <code>Section</code>.
+          Upload een bestand (<strong>.csv, .xlsx, .xls, of .ods</strong>) met kolommen: <code>User</code>, <code>ID</code> en <code>Section</code>.
         </p>
         <div class="flex flex-col sm:flex-row items-center gap-3">
           <input type="file" id="user-file-input" accept=".csv, .xlsx, .xls, .ods" class="text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
           <button onclick="handleFileUpload()" id="upload-btn" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-bold w-full sm:w-auto">
-            Opladen & Opslaan in Database
+            Opladen & Opslaan
           </button>
         </div>
         <div id="upload-status" class="text-xs mt-2 font-medium"></div>
@@ -231,7 +241,6 @@
         </div>
       </div>
 
-      <!-- Bar Chart -->
       <div class="w-full max-w-xl mx-auto mb-8">
         <canvas id="adminBarChart"></canvas>
       </div>
@@ -277,11 +286,11 @@
 
     const domainDefinitions = {
       FL: {
-        temporal: { name: "Temporele Geletterdheid", desc: "Doelgericht handelen naar open toekomsten en oude routines doorbreken." },
-        agency: { name: "Anticipatorisch Vermogen", desc: "Kiezen tussen plannen of experimenteren, en doelgericht handelen bij onzekerheid." },
-        reframing: { name: "Verbeeldingskracht & Reframing", desc: "Dominante ideeën overhoop halen met provocatieve 'wat-als'-vragen." },
-        systems: { name: "Systeemdenken", desc: "Kettingreacties en neveneffecten actief onderzoeken voor je handelt." },
-        ethics: { name: "Pluralistische Ethiek", desc: "Andermans belangen en behoeften van latere generaties direct meenemen." }
+        temporal: { name: "Temporele Geletterdheid", desc: "Meerdere toekomsten kunnen zien en beseffen dat je verwachtingen je gedrag van vandaag sturen." },
+        agency: { name: "Anticipatorisch Vermogen", desc: "Zelf kiezen hoe je naar de toekomst kijkt en onzekerheid benutten als ruimte voor nieuwe opties." },
+        reframing: { name: "Verbeeldingskracht & Reframing", desc: "Toekomstbeelden bijstellen en je radicaal andere werelden kunnen voorstellen." },
+        systems: { name: "Systeemdenken", desc: "Begrijpen dat kleine oorzaken grote gevolgen hebben en interacties tussen domeinen meenemen." },
+        ethics: { name: "Pluralistische Ethiek", desc: "Nieuwsgierig zijn naar andermans toekomstvisie en bevragen voor wie een toekomst goed is." }
       },
       FC: {
         temporal: { name: "Tijdsperspectief", desc: "Nadenken over de toekomst en de connectie met je huidige levensbeslissingen." },
@@ -292,42 +301,54 @@
       }
     };
 
-    // 1. Actieve B1 Futures Literacy Items
+    // 1. NIEUWE FUTURES LITERACY ITEMS (Direct + Omgekeerde controlevragen)
     const itemsFL = [
-      { id: "FL_TP_01", domain: "temporal", text: "Als ik plannen maak, check ik bewust of ik niet gewoon oude gewoontes zit te herhalen." },
-      { id: "FL_TP_02", domain: "temporal", text: "Voordat ik een beslissing neem, bereid ik me voor op wat waarschijnlijk gebeurt én op wat onverwachts mogelijk is." },
-      { id: "FL_TP_03", domain: "temporal", text: "Ik onderneem vandaag doelgericht acties om mee te bepalen hoe mijn toekomst eruitziet." },
-      { id: "FL_AB_01", domain: "agency", text: "Ik kies bewust wanneer ik een strak stappenplan volg en wanneer ik juist vrij ga experimenteren met nieuwe opties." },
-      { id: "FL_AB_02", domain: "agency", text: "Ik spreek of schrijf openlijk uit welke aannames achter mijn verwachtingen voor later zitten." },
-      { id: "FL_AB_03", domain: "agency", text: "Wanneer een situatie onzeker is, bedenk ik verschillende scenario's en pas ik mijn gedrag daar meteen op aan." },
-      { id: "FL_OA_01", domain: "reframing", text: "Ik ontwerp scenario's voor later die zó radicaal afwijken van nu dat ze mensen verrassen of aan het denken zetten." },
-      { id: "FL_OA_02", domain: "reframing", text: "Als anderen beweren hoe de toekomst 'moet' lopen, stel ik gerichte vragen om dat verhaal onderuit te halen." },
-      { id: "FL_OA_03", domain: "reframing", text: "Ik zet 'wat-als'-vragen in om mijn huidige manier van denken of werken overboord te gooien." },
-      { id: "FL_SP_01", domain: "systems", text: "Als ik iets nieuws begin of gebruik, zoek ik uit welke onverwachte effecten dat elders veroorzaakt." },
-      { id: "FL_SP_02", domain: "systems", text: "Ik speel flexibel in op onverwachte wendingen in plaats van star vast te houden aan één vaste route." },
-      { id: "FL_SP_03", domain: "systems", text: "Bij een probleem onderzoek ik eerst hoe mens, natuur, geld en techniek elkaar beïnvloeden voor ik in actie kom." },
-      { id: "FL_CO_01", domain: "ethics", text: "In overleg onderzoek ik actief wat voor anderen een 'slechte toekomst' zou zijn, ook als dat botst met mijn eigen wensen." },
-      { id: "FL_CO_02", domain: "ethics", text: "Ik vraag doelbewust aan mensen met een heel andere achtergrond hoe zij naar de toekomst kijken om mijn eigen plan te verbeteren." },
-      { id: "FL_CO_03", domain: "ethics", text: "Ik verander mijn huidige keuzes zodanig dat mensen die na ons komen er later geen schade van ondervinden." }
+      // Direct (15 items uit het nieuwe voorstel)
+      { id: "FL_TP_01", domain: "temporal", isReverse: false, text: "Als ik nadenk over de toekomst, bedenk ik meer dan één manier waarop die eruit kan zien." },
+      { id: "FL_TP_02", domain: "temporal", isReverse: false, text: "Bij het maken van een beslissing sta ik stil bij welk beeld van de toekomst ik in mijn hoofd heb." },
+      { id: "FL_TP_03", domain: "temporal", isReverse: false, text: "Ik merk dat wat ik over later verwacht, invloed heeft op wat ik elke dag doe." },
+
+      { id: "FL_AB_01", domain: "agency", isReverse: false, text: "Ik geloof dat ik zelf kan kiezen hoe ik naar de toekomst kijk." },
+      { id: "FL_AB_02", domain: "agency", isReverse: false, text: "Ik besef dat hoe ik mijn toekomst zie, gekleurd wordt door hoe ik me nu voel." },
+      { id: "FL_AB_03", domain: "agency", isReverse: false, text: "Zelfs als de toekomst onzeker is, zie ik dat als ruimte om nieuwe mogelijkheden te bedenken." },
+
+      { id: "FL_OA_01", domain: "reframing", isReverse: false, text: "Ik gebruik vaak nieuwe ideeën om mijn beeld van de toekomst bij te stellen." },
+      { id: "FL_OA_02", domain: "reframing", isReverse: false, text: "Ik laat me graag inspireren door toekomstbeelden die anders zijn dan wat ik zelf verwacht." },
+      { id: "FL_OA_03", domain: "reframing", isReverse: false, text: "Ik vind het leuk om me een toekomst voor te stellen die helemaal anders is dan vandaag." },
+
+      { id: "FL_SP_01", domain: "systems", isReverse: false, text: "Ik geloof dat een kleine verandering vandaag op een of andere manier grote gevolgen kan hebben voor later." },
+      { id: "FL_SP_02", domain: "systems", isReverse: false, text: "Als ik me de toekomst voorstel, denk ik na over hoe klimaat, technologie en onderwijs elkaar kunnen veranderen." },
+      { id: "FL_SP_03", domain: "systems", isReverse: false, text: "Als ik iets nieuws bedenk, vraag ik me af welke onverwachte gevolgen het later kan hebben." },
+
+      { id: "FL_CO_01", domain: "ethics", isReverse: false, text: "Ik wil graag weten hoe mensen van over de hele wereld naar hun toekomst kijken." },
+      { id: "FL_CO_02", domain: "ethics", isReverse: false, text: "Ik probeer altijd te begrijpen waarom iemand anders een andere toekomst wenst dan ik." },
+      { id: "FL_CO_03", domain: "ethics", isReverse: false, text: "Als ik me een betere toekomst voorstel, vraag ik me af voor wie die beter zou zijn en voor wie niet." },
+
+      // Omgekeerde controlevragen (5 items ter validatie)
+      { id: "FL_TP_R", domain: "temporal", isReverse: true, text: "Ik weet eigenlijk al hoe mijn toekomst eruit zal zien." },
+      { id: "FL_AB_R", domain: "agency", isReverse: true, text: "Nadenken over de toekomst heeft weinig zin, het loopt toch zoals het loopt." },
+      { id: "FL_OA_R", domain: "reframing", isReverse: true, text: "Toekomstbeelden die heel anders zijn dan nu, vind ik meestal onrealistisch." },
+      { id: "FL_SP_R", domain: "systems", isReverse: true, text: "Als ik iets verander, weet ik meestal precies welke gevolgen dat zal hebben." },
+      { id: "FL_CO_R", domain: "ethics", isReverse: true, text: "Hoe anderen hun toekomst zien, heeft weinig met mijn toekomst te maken." }
     ];
 
-    // 2. Gevalideerde Futures Consciousness Items (Lalot et al., 2024)[cite: 3]
+    // 2. Gevalideerde Futures Consciousness Items (Lalot et al., 2024)[cite: 8]
     const itemsFC = [
-      { id: "FC_TP_01", domain: "temporal", text: "Ik denk na over hoe de toekomst er mogelijk uit gaat zien." },
-      { id: "FC_TP_02", domain: "temporal", text: "Bij het maken van een beslissing denk ik na over hoe het mijn toekomst kan beïnvloeden." },
-      { id: "FC_TP_03", domain: "temporal", text: "Ik probeer de toekomst te beïnvloeden door mijn dagelijkse gedrag." },
-      { id: "FC_AB_01", domain: "agency", text: "Ik geloof dat ik in alles kan slagen als ik me ertoe zet." },
-      { id: "FC_AB_02", domain: "agency", text: "Ik ben altijd optimistisch over mijn toekomst." },
-      { id: "FC_AB_03", domain: "agency", text: "Zelfs als dingen moeilijk zijn red ik me wel." },
-      { id: "FC_OA_01", domain: "reframing", text: "Ik gebruik vaak nieuwe ideeën om wat ik doe te verbeteren." },
-      { id: "FC_OA_02", domain: "reframing", text: "Ik laat me graag inspireren door nieuwe ideeën." },
-      { id: "FC_OA_03", domain: "reframing", text: "Ik vind het leuk om dingen anders te doen dan anders." },
-      { id: "FC_SP_01", domain: "systems", text: "Ik geloof dat alles in het universum op een of andere manier met elkaar verbonden is." },
-      { id: "FC_SP_02", domain: "systems", text: "Ik denk dat alles, van klimaat tot technologie tot onderwijs, verbonden is met elkaar." },
-      { id: "FC_SP_03", domain: "systems", text: "Ik heb vaak het gevoel dat ik onderdeel ben van de natuur." },
-      { id: "FC_CO_01", domain: "ethics", text: "Ik wil graag mensen helpen, van over de hele wereld, als ze in nood zijn." },
-      { id: "FC_CO_02", domain: "ethics", text: "Ik probeer altijd oprecht, hulpvaardig en vergevingsgezind te zijn." },
-      { id: "FC_CO_03", domain: "ethics", text: "Ik probeer bij te dragen aan gelijkheid, rechtvaardigheid, duurzaamheid en een wereld zonder oorlog." }
+      { id: "FC_TP_01", domain: "temporal", isReverse: false, text: "Ik denk na over hoe de toekomst er mogelijk uit gaat zien." },
+      { id: "FC_TP_02", domain: "temporal", isReverse: false, text: "Bij het maken van een beslissing denk ik na over hoe het mijn toekomst kan beïnvloeden." },
+      { id: "FC_TP_03", domain: "temporal", isReverse: false, text: "Ik probeer de toekomst te beïnvloeden door mijn dagelijkse gedrag." },
+      { id: "FC_AB_01", domain: "agency", isReverse: false, text: "Ik geloof dat ik in alles kan slagen als ik me ertoe zet." },
+      { id: "FC_AB_02", domain: "agency", isReverse: false, text: "Ik ben altijd optimistisch over mijn toekomst." },
+      { id: "FC_AB_03", domain: "agency", isReverse: false, text: "Zelfs als dingen moeilijk zijn red ik me wel." },
+      { id: "FC_OA_01", domain: "reframing", isReverse: false, text: "Ik gebruik vaak nieuwe ideeën om wat ik doe te verbeteren." },
+      { id: "FC_OA_02", domain: "reframing", isReverse: false, text: "Ik laat me graag inspireren door nieuwe ideeën." },
+      { id: "FC_OA_03", domain: "reframing", isReverse: false, text: "Ik vind het leuk om dingen anders te doen dan anders." },
+      { id: "FC_SP_01", domain: "systems", isReverse: false, text: "Ik geloof dat alles in het universum op een of andere manier met elkaar verbonden is." },
+      { id: "FC_SP_02", domain: "systems", isReverse: false, text: "Ik denk dat alles, van klimaat tot technologie tot onderwijs, verbonden is met elkaar." },
+      { id: "FC_SP_03", domain: "systems", isReverse: false, text: "Ik heb vaak het gevoel dat ik onderdeel ben van de natuur." },
+      { id: "FC_CO_01", domain: "ethics", isReverse: false, text: "Ik wil graag mensen helpen, van over de hele wereld, als ze in nood zijn." },
+      { id: "FC_CO_02", domain: "ethics", isReverse: false, text: "Ik probeer altijd oprecht, hulpvaardig en vergevingsgezind te zijn." },
+      { id: "FC_CO_03", domain: "ethics", isReverse: false, text: "Ik probeer bij te dragen aan gelijkheid, rechtvaardigheid, duurzaamheid en een wereld zonder oorlog." }
     ];
 
     function showView(viewId) {
@@ -342,7 +363,6 @@
       loadUsers();
     }
 
-    // Geregistreerde gebruikers ophalen voor dropdowns
     async function loadUsers() {
       try {
         const res = await fetch('/.netlify/functions/submissions/users');
@@ -359,7 +379,6 @@
         indicator.classList.add('hidden');
         form.classList.remove('hidden');
 
-        // Unieke secties bepalen
         const sections = [...new Set(registeredUsers.map(u => u.section))].sort();
         const sectionSelect = document.getElementById('select-section');
         sectionSelect.innerHTML = '<option value="">-- Kies een groep (Section) --</option>' +
@@ -403,7 +422,6 @@
       }
     }
 
-    // Historiek van de gebruiker bekijken
     async function loadUserHistoryView() {
       const studentId = document.getElementById('select-user').value;
       const userObj = registeredUsers.find(u => u.studentId === studentId);
@@ -445,7 +463,6 @@
       }
     }
 
-    // Starten van de quiz
     function handleStartTest(e) {
       e.preventDefault();
       const studentId = document.getElementById('select-user').value;
@@ -469,10 +486,9 @@
       const shuffled = [...items].sort(() => Math.random() - 0.5);
 
       document.getElementById('quiz-badge').innerText = isFL ? "Toekomstgeletterdheid (FL)" : "Toekomstbewustzijn (FC)";
-      document.getElementById('quiz-title').innerText = isFL ? "Hoe zet jij de toekomst in?" : "Hoe kijk jij naar de toekomst?";
-      document.getElementById('quiz-instructions').innerHTML = isFL 
-        ? "Geef aan in hoeverre je deze handelingen toepast. <em>(1 = Past niet / doe ik niet &bull; 5 = Past helemaal / doe ik vaak)</em>"
-        : "Geef aan in hoeverre deze uitspraken waar zijn voor jou. <em>(1 = Niet waar voor mij &bull; 5 = Helemaal waar voor mij)</em>";
+      document.getElementById('quiz-title').innerText = isFL ? "Hoe ga jij om met toekomstbeelden?" : "Hoe kijk jij naar de toekomst?";
+      document.getElementById('quiz-instructions').innerHTML = 
+        "Lees elke zin zorgvuldig en geef aan in hoeverre dit klopt voor jou persoonlijk. <br><em>(1 = Klopt helemaal niet voor mij &bull; 5 = Klopt helemaal voor mij)</em>";
 
       const container = document.getElementById('quiz-container');
       container.innerHTML = shuffled.map((q, idx) => `
@@ -508,11 +524,17 @@
 
       const domainSums = { temporal: 0, agency: 0, reframing: 0, systems: 0, ethics: 0 };
       const domainCounts = { temporal: 0, agency: 0, reframing: 0, systems: 0, ethics: 0 };
+      const reverseScores = {};
 
       items.forEach(q => {
         const val = parseInt(document.querySelector(`input[name="${q.id}"]:checked`).value, 10);
-        domainSums[q.domain] += val;
-        domainCounts[q.domain] += 1;
+        if (q.isReverse) {
+          // Omgekeerde controlevraag apart opslaan
+          reverseScores[q.domain] = val;
+        } else {
+          domainSums[q.domain] += val;
+          domainCounts[q.domain] += 1;
+        }
       });
 
       const scores = {};
@@ -523,7 +545,8 @@
       const payload = {
         studentId: currentSession.user.studentId,
         testType: currentSession.testType,
-        scores
+        scores,
+        reverseScores: isFL ? reverseScores : null
       };
 
       try {
@@ -553,10 +576,16 @@
       const labels = keys.map(k => meta[k].name);
       const dataValues = keys.map(k => sub.scores[k]);
 
-      const typeLabel = sub.testType === "FL" ? "Futures Literacy (Vaardigheden)" : "Futures Consciousness (Houding & Visie)";
-      
+      const isFL = sub.testType === "FL";
+      const legendBox = document.getElementById('fl-radar-legend-info');
+      if (isFL) {
+        legendBox.classList.remove('hidden');
+      } else {
+        legendBox.classList.add('hidden');
+      }
+
       document.getElementById('result-user-title').innerText = `${sub.userName} (${sub.section})`;
-      document.getElementById('result-user-subtitle').innerText = `${typeLabel} — Afgenomen op ${sub.dateStr} om ${sub.timeStr}`;
+      document.getElementById('result-user-subtitle').innerText = `${isFL ? 'Toekomstgeletterdheid (FL)' : 'Toekomstbewustzijn (FC)'} — Afgenomen op ${sub.dateStr} om ${sub.timeStr}`;
 
       const backBtn = document.getElementById('result-back-btn');
       if (viewedByAdmin) {
@@ -569,19 +598,38 @@
 
       if (radarChartInstance) radarChartInstance.destroy();
 
+      // Datasets opbouwen
+      const datasets = [
+        {
+          label: isFL ? "Directe Vaardigheid (FL)" : sub.userName,
+          data: dataValues,
+          backgroundColor: isFL ? 'rgba(79, 70, 229, 0.25)' : 'rgba(16, 185, 129, 0.25)',
+          borderColor: isFL ? 'rgb(79, 70, 229)' : 'rgb(16, 185, 129)',
+          borderWidth: 2,
+          pointBackgroundColor: isFL ? 'rgb(79, 70, 229)' : 'rgb(16, 185, 129)'
+        }
+      ];
+
+      // Indien FL en omgekeerde scores aanwezig: voeg 2e lijn toe (oranje stippellijn)
+      if (isFL && sub.reverseScores) {
+        const reverseValues = keys.map(k => sub.reverseScores[k] || 0);
+        datasets.push({
+          label: "Controlevragen (Schijnzekerheid / Starheid)",
+          data: reverseValues,
+          backgroundColor: 'rgba(217, 119, 6, 0.1)',
+          borderColor: 'rgb(217, 119, 6)',
+          borderWidth: 2,
+          borderDash: [5, 5], // Stippellijn
+          pointBackgroundColor: 'rgb(217, 119, 6)'
+        });
+      }
+
       const ctx = document.getElementById('userRadarChart').getContext('2d');
       radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
           labels: labels,
-          datasets: [{
-            label: sub.userName,
-            data: dataValues,
-            backgroundColor: sub.testType === 'FL' ? 'rgba(99, 102, 241, 0.25)' : 'rgba(16, 185, 129, 0.25)',
-            borderColor: sub.testType === 'FL' ? 'rgb(79, 70, 229)' : 'rgb(16, 185, 129)',
-            borderWidth: 2,
-            pointBackgroundColor: sub.testType === 'FL' ? 'rgb(79, 70, 229)' : 'rgb(16, 185, 129)'
-          }]
+          datasets: datasets
         },
         options: {
           scales: {
@@ -592,26 +640,42 @@
               pointLabels: { font: { size: 11, weight: 'bold' } }
             }
           },
-          plugins: { legend: { display: false } }
+          plugins: {
+            legend: {
+              display: isFL, // Toon legenda bij dubbele lijn
+              position: 'bottom'
+            }
+          }
         }
       });
 
-      document.getElementById('dimension-feedback').innerHTML = keys.map(k => `
-        <div class="p-3 border rounded-lg bg-slate-50 flex justify-between items-center">
-          <div>
-            <h4 class="font-bold text-xs sm:text-sm text-slate-800">${meta[k].name}</h4>
-            <p class="text-xs text-slate-500">${meta[k].desc}</p>
+      document.getElementById('dimension-feedback').innerHTML = keys.map(k => {
+        const revVal = (isFL && sub.reverseScores && sub.reverseScores[k]) ? sub.reverseScores[k] : null;
+        return `
+          <div class="p-3 border rounded-lg bg-slate-50 flex justify-between items-center">
+            <div>
+              <h4 class="font-bold text-xs sm:text-sm text-slate-800">${meta[k].name}</h4>
+              <p class="text-xs text-slate-500">${meta[k].desc}</p>
+            </div>
+            <div class="flex items-center gap-2 ml-3">
+              <span class="font-bold text-sm text-indigo-700 bg-white border border-indigo-100 px-2.5 py-1 rounded shadow-sm">
+                ${sub.scores[k]} / 5
+              </span>
+              ${revVal ? `
+                <span class="font-semibold text-xs text-amber-800 bg-amber-50 border border-amber-200 px-2 py-1 rounded" title="Score op omgekeerde controlevraag (lager is beter)">
+                  R: ${revVal}
+                </span>
+              ` : ''}
+            </div>
           </div>
-          <span class="ml-3 font-bold text-sm text-indigo-700 bg-white border border-indigo-100 px-2.5 py-1 rounded shadow-sm">
-            ${sub.scores[k]} / 5
-          </span>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+
       showView('result-view');
     }
 
     // ------------------------------------------------------------------------
-    // ADMINISTRATOR LOGICA
+    // BEHEERDER LOGICA
     // ------------------------------------------------------------------------
     async function promptAdminLogin() {
       if (isAdminAuthenticated) {
@@ -660,7 +724,6 @@
       startNewSession();
     }
 
-    // Opladen en parsen van CSV/Excel/ODS bestand
     async function handleFileUpload() {
       const fileInput = document.getElementById('user-file-input');
       const statusDiv = document.getElementById('upload-status');
@@ -682,18 +745,14 @@
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(firstSheet);
 
-        if (jsonData.length === 0) {
-          throw new Error("Het bestand bevat geen rijen.");
-        }
+        if (jsonData.length === 0) throw new Error("Het bestand bevat geen rijen.");
 
-        // Valideer vereiste kolommen
         const firstRow = jsonData[0];
         const keys = Object.keys(firstRow).map(k => k.trim().toLowerCase());
         if (!keys.includes("user") || !keys.includes("id") || !keys.includes("section")) {
           throw new Error("Het bestand moet exact de kolommen 'User', 'ID' en 'Section' bevatten.");
         }
 
-        // Genormaliseerde lijst samenstellen
         const cleanUsers = jsonData.map(row => {
           let userVal = "", idVal = "", sectionVal = "";
           for (const [k, v] of Object.entries(row)) {
@@ -705,7 +764,6 @@
           return { User: userVal, ID: idVal, Section: sectionVal };
         }).filter(u => u.User && u.ID && u.Section);
 
-        // Versturen naar de database
         const res = await fetch('/.netlify/functions/submissions/admin/import-users', {
           method: 'POST',
           headers: {
@@ -824,10 +882,11 @@
         return;
       }
 
-      let csv = "ID,Datum,Tijdstip,Student_ID,Naam,Groep,Schaal,Temporeel,Agency,Reframing_Openheid,Systemen,Ethiek_Anderen,Gemiddelde\n";
+      let csv = "ID,Datum,Tijdstip,Student_ID,Naam,Groep,Schaal,Temporeel,Agency,Reframing_Openheid,Systemen,Ethiek_Anderen,Gemiddelde,TP_Rev,AB_Rev,OA_Rev,SP_Rev,CO_Rev\n";
       cachedAdminSubmissions.forEach(s => {
         const rowAvg = (Object.values(s.scores).reduce((a,b)=>a+b,0) / 5).toFixed(2);
-        csv += `"${s._id || s.id}","${s.dateStr || ''}","${s.timeStr || ''}","${s.studentId}","${s.userName}","${s.section}","${s.testType}",${s.scores.temporal},${s.scores.agency},${s.scores.reframing},${s.scores.systems},${s.scores.ethics},${rowAvg}\n`;
+        const rev = s.reverseScores || {};
+        csv += `"${s._id || s.id}","${s.dateStr || ''}","${s.timeStr || ''}","${s.studentId}","${s.userName}","${s.section}","${s.testType}",${s.scores.temporal},${s.scores.agency},${s.scores.reframing},${s.scores.systems},${s.scores.ethics},${rowAvg},${rev.temporal || ''},${rev.agency || ''},${rev.reframing || ''},${rev.systems || ''},${rev.ethics || ''}\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
