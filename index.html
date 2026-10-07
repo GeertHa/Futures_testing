@@ -69,7 +69,7 @@
                 <input type="radio" name="test-choice" value="FL" checked class="accent-indigo-600">
                 <span class="font-bold text-sm text-slate-800">Toekomstgeletterdheid</span>
               </div>
-              <p class="text-xs text-slate-500"><strong>Futures Literacy (FL):</strong> hoe bewust je omgaat met toekomstbeelden (15 items + 5 controle-items).</p>
+              <p class="text-xs text-slate-500"><strong>Futures Literacy (FL):</strong> hoe bewust je omgaat met toekomstbeelden (15 items + 5 controle-items)[cite: 14].</p>
             </label>
 
             <label class="border rounded-xl p-3.5 cursor-pointer hover:border-indigo-500 flex flex-col justify-between transition bg-slate-50 hover:bg-indigo-50/40">
@@ -77,7 +77,7 @@
                 <input type="radio" name="test-choice" value="FC" class="accent-indigo-600">
                 <span class="font-bold text-sm text-slate-800">Toekomstbewustzijn</span>
               </div>
-              <p class="text-xs text-slate-500"><strong>Futures Consciousness (FC):</strong> je persoonlijke houding en oriëntatie tegenover later (15 items).</p>
+              <p class="text-xs text-slate-500"><strong>Futures Consciousness (FC):</strong> je persoonlijke houding en visie op later (15 items)[cite: 8].</p>
             </label>
           </div>
         </div>
@@ -151,11 +151,11 @@
       <div id="fl-radar-legend-info" class="hidden bg-slate-50 border p-3 rounded-lg text-xs text-slate-600 mb-4 leading-relaxed">
         <div class="flex items-center gap-2 mb-1">
           <span class="inline-block w-3.5 h-3.5 bg-indigo-600 rounded"></span>
-          <strong class="text-indigo-950">Toekomstgeletterdheid (Direct):</strong> Hoger = sterker ontwikkeld vermogen om met open toekomsten te werken.
+          <strong class="text-indigo-950">Toekomstgeletterdheid (Direct):</strong> Hoger = sterker ontwikkeld vermogen om met open toekomsten te werken[cite: 14].
         </div>
         <div class="flex items-center gap-2">
           <span class="inline-block w-3.5 h-0.5 border-b-2 border-dashed border-amber-600"></span>
-          <strong class="text-amber-950">Schijnzekerheid / Starheid (Controlevragen):</strong> Lager = beter (toont aan dat je beseft dat de toekomst open en onzeker is).
+          <strong class="text-amber-950">Schijnzekerheid / Starheid (Controlevragen):</strong> Lager = beter (beseffen dat de toekomst open en onzeker is)[cite: 2, 14].
         </div>
       </div>
 
@@ -166,7 +166,7 @@
       <div id="dimension-feedback" class="space-y-3 mt-4"></div>
     </section>
 
-    <!-- STAP 4: ADMINISTRATOR DASHBOARD -->
+    <!-- STAP 4: ADMINISTRATOR DASHBOARD MET COMPLETE WISMOGELIJKHEDEN -->
     <section id="admin-view" class="hidden bg-white p-5 sm:p-7 rounded-xl shadow-sm border border-slate-200">
       <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 border-b pb-4 gap-4">
         <div>
@@ -174,12 +174,12 @@
             <h2 class="text-xl font-bold text-slate-800">Beheerdersdashboard</h2>
             <span class="bg-amber-100 text-amber-800 text-[11px] px-2 py-0.5 rounded font-bold">Beveiligde Modus</span>
           </div>
-          <p class="text-xs text-slate-500">Gebruikersbeheer en cohortanalyses</p>
+          <p class="text-xs text-slate-500">Gebruikersbeheer, reverse-score analyses en gegevensbeheer</p>
         </div>
         
         <div class="flex flex-wrap items-center gap-2">
           <button onclick="exportToCSV()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">
-            Exporteer Data
+            Exporteer Data (CSV)
           </button>
           <button onclick="logoutAdmin()" class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs font-medium">
             Uitloggen
@@ -187,9 +187,14 @@
         </div>
       </div>
 
-      <!-- GEBRUIKERS OPLADEN -->
+      <!-- GEBRUIKERS OPLADEN & BEHEER -->
       <div class="mb-8 p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl">
-        <h3 class="font-bold text-sm text-indigo-950 mb-1">Geregistreerde gebruikers importeren</h3>
+        <div class="flex justify-between items-center mb-1">
+          <h3 class="font-bold text-sm text-indigo-950">Geregistreerde gebruikers beheren</h3>
+          <button onclick="deleteUsersDatabase()" class="text-[11px] text-red-600 hover:underline">
+            Wis alle geregistreerde accounts
+          </button>
+        </div>
         <p class="text-xs text-slate-600 mb-3">
           Upload een bestand (<strong>.csv, .xlsx, .xls, of .ods</strong>) met kolommen: <code>User</code>, <code>ID</code> en <code>Section</code>.
         </p>
@@ -202,21 +207,33 @@
         <div id="upload-status" class="text-xs mt-2 font-medium"></div>
       </div>
 
-      <!-- FILTERS -->
-      <div class="flex flex-wrap items-center gap-4 mb-4">
-        <div>
-          <label class="text-[10px] font-bold uppercase text-slate-400 block">Filter Schaal</label>
-          <select id="admin-type-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-slate-50 font-medium">
-            <option value="FL">Futures Literacy (FL)</option>
-            <option value="FC">Futures Consciousness (FC)</option>
-          </select>
+      <!-- FILTERS & GROEPSGEBONDEN ACTIES -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-lg border">
+        <div class="flex flex-wrap items-center gap-4">
+          <div>
+            <label class="text-[10px] font-bold uppercase text-slate-400 block">Schaal</label>
+            <select id="admin-type-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-white font-medium">
+              <option value="FL">Futures Literacy (FL)</option>
+              <option value="FC">Futures Consciousness (FC)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[10px] font-bold uppercase text-slate-400 block">Filter Groep (Section)</label>
+            <select id="admin-group-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-white font-medium">
+              <option value="ALL">Alle groepen</option>
+            </select>
+          </div>
         </div>
 
-        <div>
-          <label class="text-[10px] font-bold uppercase text-slate-400 block">Filter Groep (Section)</label>
-          <select id="admin-group-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-slate-50 font-medium">
-            <option value="ALL">Alle groepen</option>
-          </select>
+        <!-- Wisknoppen voor selecties -->
+        <div class="flex items-center gap-2 pt-2 sm:pt-0">
+          <button onclick="deleteCurrentGroup()" id="delete-group-btn" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-xs font-semibold">
+            Wis geselecteerde groep
+          </button>
+          <button onclick="deleteAllSubmissions()" class="px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold">
+            Wis ALLE afnames
+          </button>
         </div>
       </div>
 
@@ -227,7 +244,7 @@
           <div id="stat-count" class="text-xl font-bold text-indigo-700">0</div>
         </div>
         <div class="bg-slate-50 border rounded-lg p-3 text-center">
-          <div class="text-[11px] uppercase font-bold text-slate-400">Gemiddelde</div>
+          <div class="text-[11px] uppercase font-bold text-slate-400">Gem. Directe Score</div>
           <div id="stat-avg" class="text-xl font-bold text-indigo-700">0.0</div>
         </div>
         <div class="bg-slate-50 border rounded-lg p-3 text-center">
@@ -235,20 +252,21 @@
           <div id="stat-strongest" class="text-xs font-semibold text-slate-700 mt-1 truncate">-</div>
         </div>
         <div class="bg-slate-50 border rounded-lg p-3 text-center">
-          <div class="text-[11px] uppercase font-bold text-slate-400">Groeipotentieel</div>
+          <div class="text-[11px] uppercase font-bold text-slate-400" id="stat-reverse-label">Groeipotentieel</div>
           <div id="stat-growth" class="text-xs font-semibold text-slate-700 mt-1 truncate">-</div>
         </div>
       </div>
 
+      <!-- Cohort Bar Chart (Dubbele kolommen bij FL) -->
       <div class="w-full max-w-xl mx-auto mb-8">
         <canvas id="adminBarChart"></canvas>
       </div>
 
-      <!-- Tabel met dossiers -->
+      <!-- Tabel met dossiers en individuele wisknop -->
       <div class="overflow-x-auto border rounded-lg">
         <table class="min-w-full text-left text-xs">
           <thead class="bg-slate-100 uppercase text-slate-600 font-bold border-b">
-            <tr>
+            <tr id="admin-table-head-row">
               <th class="p-2.5">Deelnemer</th>
               <th class="p-2.5">ID</th>
               <th class="p-2.5">Groep</th>
@@ -259,7 +277,7 @@
               <th class="p-2.5 text-center">Systeem</th>
               <th class="p-2.5 text-center">Ethiek</th>
               <th class="p-2.5 text-center">Gem.</th>
-              <th class="p-2.5 text-right">Detail</th>
+              <th class="p-2.5 text-right">Acties</th>
             </tr>
           </thead>
           <tbody id="admin-table-body" class="divide-y text-slate-700"></tbody>
@@ -669,7 +687,7 @@
     }
 
     // ------------------------------------------------------------------------
-    // BEHEERDER LOGICA
+    // BEHEERDER LOGICA & WISMOGELIJKHEDEN
     // ------------------------------------------------------------------------
     async function promptAdminLogin() {
       if (isAdminAuthenticated) {
@@ -789,10 +807,88 @@
       }
     }
 
+    // ------------------------------------------------------------------------
+    // WISMETHODEN
+    // ------------------------------------------------------------------------
+    async function deleteSingleSubmission(id) {
+      if (!confirm("Weet je zeker dat je deze testafname definitief wilt verwijderen?")) return;
+
+      try {
+        const res = await fetch(`/.netlify/functions/submissions/admin?id=${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (!res.ok) throw new Error("Verwijderen mislukt");
+        await fetchAdminData();
+      } catch (err) {
+        alert("Fout bij verwijderen: " + err.message);
+      }
+    }
+
+    async function deleteCurrentGroup() {
+      const selectedGroup = document.getElementById('admin-group-filter').value;
+      if (selectedGroup === "ALL") {
+        alert("Selecteer eerst een specifieke groep in het dropdownmenu om die te kunnen wissen.");
+        return;
+      }
+
+      if (!confirm(`Weet je zeker dat je ALLE testinzendingen van de groep '${selectedGroup}' wilt wissen? Dit kan niet ongedaan worden gemaakt.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/.netlify/functions/submissions/admin?section=${encodeURIComponent(selectedGroup)}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (!res.ok) throw new Error("Verwijderen mislukt");
+        await fetchAdminData();
+      } catch (err) {
+        alert("Fout bij verwijderen van groep: " + err.message);
+      }
+    }
+
+    async function deleteAllSubmissions() {
+      const check = prompt("Typ 'VERWIJDER' om ALLE testafnames definitief uit de database te wissen:");
+      if (check !== "VERWIJDER") return;
+
+      try {
+        const res = await fetch('/.netlify/functions/submissions/admin?allSubmissions=true', {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (!res.ok) throw new Error("Reset mislukt");
+        await fetchAdminData();
+      } catch (err) {
+        alert("Fout bij resetten: " + err.message);
+      }
+    }
+
+    async function deleteUsersDatabase() {
+      const check = prompt("Typ 'WIS GEBRUIKERS' om alle geregistreerde studentenaccounts te wissen:");
+      if (check !== "WIS GEBRUIKERS") return;
+
+      try {
+        const res = await fetch('/.netlify/functions/submissions/admin?clearUsers=true', {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (!res.ok) throw new Error("Wissen van gebruikers mislukt");
+        alert("Alle geregistreerde accounts zijn gewist.");
+        loadUsers();
+      } catch (err) {
+        alert("Fout: " + err.message);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // DASHBOARD RENDERING MET REVERSE VERWERKING
+    // ------------------------------------------------------------------------
     function renderAdminDashboard() {
       if (!isAdminAuthenticated) return;
 
       const currentType = document.getElementById('admin-type-filter').value;
+      const isFL = currentType === "FL";
       const typeFiltered = cachedAdminSubmissions.filter(s => s.testType === currentType);
 
       const groups = [...new Set(typeFiltered.map(s => s.section))].sort();
@@ -810,6 +906,22 @@
 
       document.getElementById('stat-count').innerText = finalFiltered.length;
 
+      // Update tabel header afhankelijk van FL of FC
+      const theadRow = document.getElementById('admin-table-head-row');
+      theadRow.innerHTML = `
+        <th class="p-2.5">Deelnemer</th>
+        <th class="p-2.5">ID</th>
+        <th class="p-2.5">Groep</th>
+        <th class="p-2.5">Datum & Tijd</th>
+        <th class="p-2.5 text-center">Tijd ${isFL ? '(R)' : ''}</th>
+        <th class="p-2.5 text-center">Agency ${isFL ? '(R)' : ''}</th>
+        <th class="p-2.5 text-center">Openheid ${isFL ? '(R)' : ''}</th>
+        <th class="p-2.5 text-center">Systeem ${isFL ? '(R)' : ''}</th>
+        <th class="p-2.5 text-center">Ethiek ${isFL ? '(R)' : ''}</th>
+        <th class="p-2.5 text-center">Gem.</th>
+        <th class="p-2.5 text-right">Acties</th>
+      `;
+
       if (finalFiltered.length === 0) {
         document.getElementById('stat-avg').innerText = "0.0";
         document.getElementById('stat-strongest').innerText = "-";
@@ -822,10 +934,16 @@
       const keys = ["temporal", "agency", "reframing", "systems", "ethics"];
       const meta = domainDefinitions[currentType];
       const domainAvg = {};
+      const reverseAvg = {};
 
       keys.forEach(k => {
         const sum = finalFiltered.reduce((acc, curr) => acc + (curr.scores[k] || 0), 0);
         domainAvg[k] = +(sum / finalFiltered.length).toFixed(2);
+
+        if (isFL) {
+          const revSum = finalFiltered.reduce((acc, curr) => acc + ((curr.reverseScores && curr.reverseScores[k]) || 0), 0);
+          reverseAvg[k] = +(revSum / finalFiltered.length).toFixed(2);
+        }
       });
 
       const overallAvg = +(Object.values(domainAvg).reduce((a,b)=>a+b,0) / keys.length).toFixed(2);
@@ -833,44 +951,89 @@
 
       let sorted = [...keys].sort((a,b) => domainAvg[b] - domainAvg[a]);
       document.getElementById('stat-strongest').innerText = meta[sorted[0]].name;
-      document.getElementById('stat-growth').innerText = meta[sorted[sorted.length - 1]].name;
 
+      if (isFL) {
+        document.getElementById('stat-reverse-label').innerText = "Meeste Schijnzekerheid (R)";
+        let sortedRev = [...keys].sort((a,b) => reverseAvg[b] - reverseAvg[a]);
+        document.getElementById('stat-growth').innerText = `${meta[sortedRev[0]].name} (${reverseAvg[sortedRev[0]]})`;
+      } else {
+        document.getElementById('stat-reverse-label').innerText = "Groeipotentieel";
+        document.getElementById('stat-growth').innerText = meta[sorted[sorted.length - 1]].name;
+      }
+
+      // Bar Chart met dubbele staven voor FL
       if (barChartInstance) barChartInstance.destroy();
       const ctx = document.getElementById('adminBarChart').getContext('2d');
+
+      const chartDatasets = [
+        {
+          label: isFL ? 'Directe FL Vaardigheid (Gemiddelde)' : 'Cohortgemiddelde',
+          data: keys.map(k => domainAvg[k]),
+          backgroundColor: isFL ? 'rgba(79, 70, 229, 0.85)' : 'rgba(16, 185, 129, 0.85)',
+          borderRadius: 4
+        }
+      ];
+
+      if (isFL) {
+        chartDatasets.push({
+          label: 'Controlevragen: Schijnzekerheid / Starheid (R)',
+          data: keys.map(k => reverseAvg[k]),
+          backgroundColor: 'rgba(217, 119, 6, 0.75)',
+          borderRadius: 4
+        });
+      }
+
       barChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: keys.map(k => meta[k].name),
-          datasets: [{
-            data: keys.map(k => domainAvg[k]),
-            backgroundColor: currentType === 'FL' ? 'rgba(79, 70, 229, 0.75)' : 'rgba(16, 185, 129, 0.75)',
-            borderRadius: 4
-          }]
+          labels: keys.map(k => meta[k].name.split(" ")[0]),
+          datasets: chartDatasets
         },
         options: {
           responsive: true,
-          plugins: { legend: { display: false } },
+          plugins: { 
+            legend: { 
+              display: isFL, 
+              position: 'bottom' 
+            } 
+          },
           scales: { y: { min: 0, max: 5, ticks: { stepSize: 1 } } }
         }
       });
 
+      // Tabelrijen opbouwen met actieknoppen en R-scores
       document.getElementById('admin-table-body').innerHTML = finalFiltered.map(s => {
         const rowAvg = (Object.values(s.scores).reduce((a,b)=>a+b,0) / keys.length).toFixed(2);
+        const rev = s.reverseScores || {};
+        const id = s._id || s.id;
+
+        const renderCell = (k) => {
+          const main = s.scores[k];
+          const r = rev[k];
+          if (isFL && r !== undefined) {
+            return `<div class="text-center"><span>${main}</span> <span class="text-[10px] text-amber-700 font-bold bg-amber-50 px-1 rounded ml-0.5">R:${r}</span></div>`;
+          }
+          return `<div class="text-center">${main}</div>`;
+        };
+
         return `
           <tr class="hover:bg-slate-50">
             <td class="p-2.5 font-semibold text-slate-800">${s.userName}</td>
             <td class="p-2.5 text-slate-500">${s.studentId}</td>
             <td class="p-2.5 text-slate-500">${s.section}</td>
             <td class="p-2.5 text-slate-600 text-[11px]">${s.dateStr || ''} ${s.timeStr || ''}</td>
-            <td class="p-2.5 text-center">${s.scores.temporal}</td>
-            <td class="p-2.5 text-center">${s.scores.agency}</td>
-            <td class="p-2.5 text-center">${s.scores.reframing}</td>
-            <td class="p-2.5 text-center">${s.scores.systems}</td>
-            <td class="p-2.5 text-center">${s.scores.ethics}</td>
+            <td class="p-2.5">${renderCell('temporal')}</td>
+            <td class="p-2.5">${renderCell('agency')}</td>
+            <td class="p-2.5">${renderCell('reframing')}</td>
+            <td class="p-2.5">${renderCell('systems')}</td>
+            <td class="p-2.5">${renderCell('ethics')}</td>
             <td class="p-2.5 text-center font-bold text-indigo-700">${rowAvg}</td>
-            <td class="p-2.5 text-right">
-              <button onclick='renderRadar(${JSON.stringify(s)}, true)' class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-medium text-[11px]">
+            <td class="p-2.5 text-right whitespace-nowrap">
+              <button onclick='renderRadar(${JSON.stringify(s)}, true)' class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-medium text-[11px] mr-1">
                 Fiche
+              </button>
+              <button onclick="deleteSingleSubmission('${id}')" class="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded font-medium text-[11px]" title="Verwijder afname">
+                ✕
               </button>
             </td>
           </tr>
