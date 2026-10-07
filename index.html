@@ -148,7 +148,6 @@
         </button>
       </div>
 
-      <!-- Toelichting bij de dubbele lijn (enkel bij FL) -->
       <div id="fl-radar-legend-info" class="hidden bg-slate-50 border p-3 rounded-lg text-xs text-slate-600 mb-4 leading-relaxed">
         <div class="flex items-center gap-2 mb-1">
           <span class="inline-block w-3.5 h-3.5 bg-indigo-600 rounded"></span>
@@ -301,9 +300,8 @@
       }
     };
 
-    // 1. NIEUWE FUTURES LITERACY ITEMS (Direct + Omgekeerde controlevragen)
+    // 1. FUTURES LITERACY ITEMS (15 direct + 5 omgekeerde controlevragen)
     const itemsFL = [
-      // Direct (15 items uit het nieuwe voorstel)
       { id: "FL_TP_01", domain: "temporal", isReverse: false, text: "Als ik nadenk over de toekomst, bedenk ik meer dan één manier waarop die eruit kan zien." },
       { id: "FL_TP_02", domain: "temporal", isReverse: false, text: "Bij het maken van een beslissing sta ik stil bij welk beeld van de toekomst ik in mijn hoofd heb." },
       { id: "FL_TP_03", domain: "temporal", isReverse: false, text: "Ik merk dat wat ik over later verwacht, invloed heeft op wat ik elke dag doe." },
@@ -324,7 +322,6 @@
       { id: "FL_CO_02", domain: "ethics", isReverse: false, text: "Ik probeer altijd te begrijpen waarom iemand anders een andere toekomst wenst dan ik." },
       { id: "FL_CO_03", domain: "ethics", isReverse: false, text: "Als ik me een betere toekomst voorstel, vraag ik me af voor wie die beter zou zijn en voor wie niet." },
 
-      // Omgekeerde controlevragen (5 items ter validatie)
       { id: "FL_TP_R", domain: "temporal", isReverse: true, text: "Ik weet eigenlijk al hoe mijn toekomst eruit zal zien." },
       { id: "FL_AB_R", domain: "agency", isReverse: true, text: "Nadenken over de toekomst heeft weinig zin, het loopt toch zoals het loopt." },
       { id: "FL_OA_R", domain: "reframing", isReverse: true, text: "Toekomstbeelden die heel anders zijn dan nu, vind ik meestal onrealistisch." },
@@ -529,7 +526,6 @@
       items.forEach(q => {
         const val = parseInt(document.querySelector(`input[name="${q.id}"]:checked`).value, 10);
         if (q.isReverse) {
-          // Omgekeerde controlevraag apart opslaan
           reverseScores[q.domain] = val;
         } else {
           domainSums[q.domain] += val;
@@ -598,7 +594,6 @@
 
       if (radarChartInstance) radarChartInstance.destroy();
 
-      // Datasets opbouwen
       const datasets = [
         {
           label: isFL ? "Directe Vaardigheid (FL)" : sub.userName,
@@ -610,7 +605,6 @@
         }
       ];
 
-      // Indien FL en omgekeerde scores aanwezig: voeg 2e lijn toe (oranje stippellijn)
       if (isFL && sub.reverseScores) {
         const reverseValues = keys.map(k => sub.reverseScores[k] || 0);
         datasets.push({
@@ -619,7 +613,7 @@
           backgroundColor: 'rgba(217, 119, 6, 0.1)',
           borderColor: 'rgb(217, 119, 6)',
           borderWidth: 2,
-          borderDash: [5, 5], // Stippellijn
+          borderDash: [5, 5],
           pointBackgroundColor: 'rgb(217, 119, 6)'
         });
       }
@@ -642,7 +636,7 @@
           },
           plugins: {
             legend: {
-              display: isFL, // Toon legenda bij dubbele lijn
+              display: isFL,
               position: 'bottom'
             }
           }
@@ -687,14 +681,13 @@
       const inputPwd = prompt("Voer het administrator wachtwoord in:");
       if (!inputPwd) return;
 
-      adminToken = inputPwd;
+      adminToken = inputPwd.trim();
       const success = await fetchAdminData();
       if (success) {
         isAdminAuthenticated = true;
         showView('admin-view');
       } else {
         adminToken = "";
-        alert("Toegang geweigerd of verkeerd wachtwoord.");
       }
     }
 
@@ -705,14 +698,23 @@
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
 
-        if (res.status === 401) return false;
-        if (!res.ok) throw new Error("Fout bij ophalen van data");
+        const data = await res.json();
 
-        cachedAdminSubmissions = await res.json();
+        if (res.status === 401) {
+          alert("Wachtwoord onjuist! (HTTP 401)");
+          return false;
+        }
+
+        if (!res.ok) {
+          alert("Serverfout (" + res.status + "): " + (data.error || "Onbekende fout"));
+          return false;
+        }
+
+        cachedAdminSubmissions = data;
         renderAdminDashboard();
         return true;
       } catch (err) {
-        console.error(err);
+        alert("Netwerkfout: " + err.message);
         return false;
       }
     }
