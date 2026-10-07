@@ -1,7 +1,6 @@
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 
 const uri = process.env.MONGODB_URI;
-// Trim eventuele onzichtbare spaties weg
 const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || "admin").trim();
 
 let cachedClient = null;
@@ -18,7 +17,7 @@ exports.handler = async (event) => {
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
     "Content-Type": "application/json"
   };
 
@@ -32,14 +31,12 @@ exports.handler = async (event) => {
     const usersCol = db.collection("users");
     const submissionsCol = db.collection("submissions");
 
-    // Robuuste token extractie (ongevoelig voor hoofdletters in headers)
     const rawAuth = event.headers.authorization || event.headers.Authorization || "";
     const token = rawAuth.replace(/^Bearer\s+/i, "").trim();
-
     const fullPath = event.path || "";
 
     // ------------------------------------------------------------------------
-    // 1. BEHEERDERS ENDPOINTS (Pad bevat 'admin')
+    // 1. BEHEERDERS ENDPOINTS (Vereist token)
     // ------------------------------------------------------------------------
     if (fullPath.includes("admin")) {
       if (token !== ADMIN_PASSWORD) {
@@ -50,7 +47,7 @@ exports.handler = async (event) => {
         };
       }
 
-      // D. Gebruikers importeren vanuit CSV/Excel/ODS
+      // D. Gebruikers importeren
       if (event.httpMethod === "POST" && fullPath.includes("import-users")) {
         const { users } = JSON.parse(event.body);
         if (!Array.isArray(users) || users.length === 0) {
@@ -75,10 +72,47 @@ exports.handler = async (event) => {
         return { statusCode: 200, headers, body: JSON.stringify({ success: true, count: users.length }) };
       }
 
-      // E. Alle submissions ophalen voor het beheeroverzicht
-      if (event.httpMethod === "GET") {
+      // E. Alle submissions ophalen
+      if (event.httpMethod === "GET" && fullPath.includes("submissions")) {
         const submissions = await submissionsCol.find({}).sort({ timestamp: -1 }).toArray();
         return { statusCode: 200, headers, body: JSON.stringify(submissions) };
+      }
+
+      // F. WISMOGELIJKHEDEN (DELETE)
+      if (event.httpMethod === "DELETE") {
+        const urlParams = event.queryStringParameters || {};
+
+        // 1. Wis specifieke inzending via ID
+        if (urlParams.id) {
+          let filter = {};
+          try {
+            filter = { _id: new ObjectId(urlParams.id) };
+          } catch(e) {
+            filter = { id: urlParams.id };
+          }
+          const res = await submissionsCol.deleteOne(filter);
+          return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
+        }
+
+        // 2. Wis alle inzendingen van een specifieke groep
+        if (urlParams.section && urlParams.section !== "ALL") {
+          const res = await submissionsCol.deleteMany({ section: urlParams.section });
+          return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
+        }
+
+        // 3. Wis alle geregistreerde gebruikers
+        if (urlParams.clearUsers === "true") {
+          const res = await usersCol.deleteMany({});
+          return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
+        }
+
+        // 4. Wis alle testinzendingen (volledige database reset voor tests)
+        if (urlParams.allSubmissions === "true") {
+          const res = await submissionsCol.deleteMany({});
+          return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
+        }
+
+        return { statusCode: 400, headers, body: JSON.stringify({ error: "Geen geldige wis-opdracht opgegeven" }) };
       }
     }
 
@@ -86,13 +120,13 @@ exports.handler = async (event) => {
     // 2. REGULIERE GEBRUIKERS ENDPOINTS
     // ------------------------------------------------------------------------
 
-    // A. Users lijst voor de Section / User dropdowns
+    // A. Users lijst voor dropdown
     if (event.httpMethod === "GET" && fullPath.includes("users")) {
       const users = await usersCol.find({}, { projection: { user: 1, studentId: 1, section: 1 } }).toArray();
       return { statusCode: 200, headers, body: JSON.stringify(users) };
     }
 
-    // B. Gebruiker historiek ophalen
+    // B. Gebruiker historiek
     if (event.httpMethod === "GET" && fullPath.includes("user-history")) {
       const parts = fullPath.split("/");
       const studentId = decodeURIComponent(parts[parts.length - 1]);
