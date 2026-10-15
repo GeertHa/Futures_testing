@@ -47,7 +47,7 @@ exports.handler = async (event) => {
         };
       }
 
-      // D. Gebruikers importeren
+      // D. Gebruikers importeren (Upsert: bestaande data blijft volledig behouden)
       if (event.httpMethod === "POST" && fullPath.includes("import-users")) {
         const { users } = JSON.parse(event.body);
         if (!Array.isArray(users) || users.length === 0) {
@@ -82,7 +82,6 @@ exports.handler = async (event) => {
       if (event.httpMethod === "DELETE") {
         const urlParams = event.queryStringParameters || {};
 
-        // 1. Wis specifieke inzending via ID
         if (urlParams.id) {
           let filter = {};
           try {
@@ -94,19 +93,16 @@ exports.handler = async (event) => {
           return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
         }
 
-        // 2. Wis alle inzendingen van een specifieke groep
         if (urlParams.section && urlParams.section !== "ALL") {
           const res = await submissionsCol.deleteMany({ section: urlParams.section });
           return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
         }
 
-        // 3. Wis alle geregistreerde gebruikers
         if (urlParams.clearUsers === "true") {
           const res = await usersCol.deleteMany({});
           return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
         }
 
-        // 4. Wis alle testinzendingen (volledige database reset voor tests)
         if (urlParams.allSubmissions === "true") {
           const res = await submissionsCol.deleteMany({});
           return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
@@ -120,13 +116,11 @@ exports.handler = async (event) => {
     // 2. REGULIERE GEBRUIKERS ENDPOINTS
     // ------------------------------------------------------------------------
 
-    // A. Users lijst voor dropdown
     if (event.httpMethod === "GET" && fullPath.includes("users")) {
       const users = await usersCol.find({}, { projection: { user: 1, studentId: 1, section: 1 } }).toArray();
       return { statusCode: 200, headers, body: JSON.stringify(users) };
     }
 
-    // B. Gebruiker historiek
     if (event.httpMethod === "GET" && fullPath.includes("user-history")) {
       const parts = fullPath.split("/");
       const studentId = decodeURIComponent(parts[parts.length - 1]);
@@ -134,7 +128,7 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify(history) };
     }
 
-    // C. Test opslaan
+    // C. Test opslaan (Inclusief alle individuele antwoorden in 'answers')
     if (event.httpMethod === "POST") {
       const data = JSON.parse(event.body);
 
@@ -151,6 +145,7 @@ exports.handler = async (event) => {
         testType: data.testType, // 'FL' of 'FC'
         scores: data.scores,
         reverseScores: data.reverseScores || null,
+        answers: data.answers || {}, // Individuele item-antwoorden voor validatie-analyse
         timestamp: now.toISOString(),
         dateStr: now.toLocaleDateString("nl-NL"),
         timeStr: now.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })
