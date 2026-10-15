@@ -11,7 +11,7 @@
 <body class="bg-slate-100 text-slate-800 min-h-screen">
 
   <header class="bg-indigo-700 text-white py-4 shadow-md sticky top-0 z-50">
-    <div class="max-w-4xl mx-auto px-4 flex justify-between items-center">
+    <div class="max-w-5xl mx-auto px-4 flex justify-between items-center">
       <div>
         <h1 class="text-xl font-bold tracking-tight">Kijk op de Toekomst</h1>
         <p class="text-indigo-200 text-xs">Futures Literacy & Consciousness Platform</p>
@@ -27,7 +27,7 @@
     </div>
   </header>
 
-  <main class="max-w-4xl mx-auto p-4 sm:p-6">
+  <main class="max-w-5xl mx-auto p-4 sm:p-6">
     
     <!-- STAP 1: KEUZE SECTIE EN GEBRUIKER -->
     <section id="step1-view" class="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-slate-200 max-w-xl mx-auto">
@@ -69,7 +69,7 @@
                 <input type="radio" name="test-choice" value="FL" checked class="accent-indigo-600">
                 <span class="font-bold text-sm text-slate-800">Toekomstgeletterdheid</span>
               </div>
-              <p class="text-xs text-slate-500"><strong>Futures Literacy (FL):</strong> hoe bewust je omgaat met toekomstbeelden (15 items + 5 controle-items)[cite: 14].</p>
+              <p class="text-xs text-slate-500"><strong>Futures Literacy (FL):</strong> hoe bewust je omgaat met toekomstbeelden (15 items + 5 controle-items).</p>
             </label>
 
             <label class="border rounded-xl p-3.5 cursor-pointer hover:border-indigo-500 flex flex-col justify-between transition bg-slate-50 hover:bg-indigo-50/40">
@@ -77,7 +77,7 @@
                 <input type="radio" name="test-choice" value="FC" class="accent-indigo-600">
                 <span class="font-bold text-sm text-slate-800">Toekomstbewustzijn</span>
               </div>
-              <p class="text-xs text-slate-500"><strong>Futures Consciousness (FC):</strong> je persoonlijke houding en visie op later (15 items)[cite: 8].</p>
+              <p class="text-xs text-slate-500"><strong>Futures Consciousness (FC):</strong> je persoonlijke houding en visie op later (15 items).</p>
             </label>
           </div>
         </div>
@@ -136,7 +136,7 @@
       </form>
     </section>
 
-    <!-- STAP 3: INDIVIDUEEL RESULTAAT MET DUBBELE RADAR LIJN -->
+    <!-- STAP 3: INDIVIDUEEL RESULTAAT MET DUBBELE RADAR LIJN & ITEM DETAILS -->
     <section id="result-view" class="hidden bg-white p-5 sm:p-7 rounded-xl shadow-sm border border-slate-200">
       <div class="flex justify-between items-center mb-4 border-b pb-3">
         <div>
@@ -151,11 +151,11 @@
       <div id="fl-radar-legend-info" class="hidden bg-slate-50 border p-3 rounded-lg text-xs text-slate-600 mb-4 leading-relaxed">
         <div class="flex items-center gap-2 mb-1">
           <span class="inline-block w-3.5 h-3.5 bg-indigo-600 rounded"></span>
-          <strong class="text-indigo-950">Toekomstgeletterdheid (Direct):</strong> Hoger = sterker ontwikkeld vermogen om met open toekomsten te werken[cite: 14].
+          <strong class="text-indigo-950">Toekomstgeletterdheid (Direct):</strong> Hoger = sterker ontwikkeld vermogen om met open toekomsten te werken.
         </div>
         <div class="flex items-center gap-2">
           <span class="inline-block w-3.5 h-0.5 border-b-2 border-dashed border-amber-600"></span>
-          <strong class="text-amber-950">Schijnzekerheid / Starheid (Controlevragen):</strong> Lager = beter (beseffen dat de toekomst open en onzeker is)[cite: 2, 14].
+          <strong class="text-amber-950">Schijnzekerheid / Starheid (Controlevragen):</strong> Lager = beter (beseffen dat de toekomst open en onzeker is).
         </div>
       </div>
 
@@ -164,22 +164,40 @@
       </div>
 
       <div id="dimension-feedback" class="space-y-3 mt-4"></div>
+
+      <!-- Individuele antwoorden weergave (vooral nuttig voor beheerder/validatie) -->
+      <div id="individual-answers-section" class="mt-8 border-t pt-6 hidden">
+        <h3 class="font-bold text-sm text-slate-800 mb-3">Ingevulde antwoorden per vraag (Item-niveau)</h3>
+        <div class="overflow-x-auto border rounded-lg">
+          <table class="min-w-full text-left text-xs">
+            <thead class="bg-slate-100 uppercase text-slate-600 font-bold border-b">
+              <tr>
+                <th class="p-2 w-20">Item ID</th>
+                <th class="p-2 w-36">Domein</th>
+                <th class="p-2">Stelling</th>
+                <th class="p-2 w-20 text-center">Score (1-5)</th>
+              </tr>
+            </thead>
+            <tbody id="individual-answers-tbody" class="divide-y text-slate-700"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
-    <!-- STAP 4: ADMINISTRATOR DASHBOARD MET COMPLETE WISMOGELIJKHEDEN -->
+    <!-- STAP 4: ADMINISTRATOR DASHBOARD -->
     <section id="admin-view" class="hidden bg-white p-5 sm:p-7 rounded-xl shadow-sm border border-slate-200">
       <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 border-b pb-4 gap-4">
         <div>
           <div class="flex items-center gap-2">
             <h2 class="text-xl font-bold text-slate-800">Beheerdersdashboard</h2>
-            <span class="bg-amber-100 text-amber-800 text-[11px] px-2 py-0.5 rounded font-bold">Beveiligde Modus</span>
+            <span class="bg-amber-100 text-amber-800 text-[11px] px-2 py-0.5 rounded font-bold">Validatie & Beheer</span>
           </div>
-          <p class="text-xs text-slate-500">Gebruikersbeheer, reverse-score analyses en gegevensbeheer</p>
+          <p class="text-xs text-slate-500">Cohortanalyse, item-vergelijking FL vs. FC en data-export</p>
         </div>
         
         <div class="flex flex-wrap items-center gap-2">
-          <button onclick="exportToCSV()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">
-            Exporteer Data (CSV)
+          <button onclick="exportToCSV()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold shadow-sm">
+            Exporteer Volledige CSV (incl. alle items)
           </button>
           <button onclick="logoutAdmin()" class="px-2.5 py-1.5 bg-slate-200 hover:bg-slate-300 rounded text-xs font-medium">
             Uitloggen
@@ -187,102 +205,170 @@
         </div>
       </div>
 
-      <!-- GEBRUIKERS OPLADEN & BEHEER -->
-      <div class="mb-8 p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl">
-        <div class="flex justify-between items-center mb-1">
-          <h3 class="font-bold text-sm text-indigo-950">Geregistreerde gebruikers beheren</h3>
-          <button onclick="deleteUsersDatabase()" class="text-[11px] text-red-600 hover:underline">
-            Wis alle geregistreerde accounts
-          </button>
-        </div>
-        <p class="text-xs text-slate-600 mb-3">
-          Upload een bestand (<strong>.csv, .xlsx, .xls, of .ods</strong>) met kolommen: <code>User</code>, <code>ID</code> en <code>Section</code>.
-        </p>
-        <div class="flex flex-col sm:flex-row items-center gap-3">
-          <input type="file" id="user-file-input" accept=".csv, .xlsx, .xls, .ods" class="text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
-          <button onclick="handleFileUpload()" id="upload-btn" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-bold w-full sm:w-auto">
-            Opladen & Opslaan
-          </button>
-        </div>
-        <div id="upload-status" class="text-xs mt-2 font-medium"></div>
+      <!-- SUB-NAVIGATIE TABS VOOR BEHEERDER -->
+      <div class="flex space-x-2 border-b mb-6">
+        <button id="tab-btn-cohort" onclick="switchAdminTab('cohort')" class="px-4 py-2 text-xs font-bold border-b-2 border-indigo-600 text-indigo-700">
+          1. Cohort & Dossiers
+        </button>
+        <button id="tab-btn-compare" onclick="switchAdminTab('compare')" class="px-4 py-2 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+          2. Item-Vergelijking (FL vs. FC)
+        </button>
+        <button id="tab-btn-users" onclick="switchAdminTab('users')" class="px-4 py-2 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+          3. Gebruikersbeheer
+        </button>
       </div>
 
-      <!-- FILTERS & GROEPSGEBONDEN ACTIES -->
-      <div class="flex flex-wrap items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-lg border">
-        <div class="flex flex-wrap items-center gap-4">
-          <div>
-            <label class="text-[10px] font-bold uppercase text-slate-400 block">Schaal</label>
-            <select id="admin-type-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-white font-medium">
-              <option value="FL">Futures Literacy (FL)</option>
-              <option value="FC">Futures Consciousness (FC)</option>
-            </select>
+      <!-- TAB 1: COHORT & DOSSIERS -->
+      <div id="admin-tab-cohort">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-lg border">
+          <div class="flex flex-wrap items-center gap-4">
+            <div>
+              <label class="text-[10px] font-bold uppercase text-slate-400 block">Schaal</label>
+              <select id="admin-type-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-white font-medium">
+                <option value="FL">Futures Literacy (FL)</option>
+                <option value="FC">Futures Consciousness (FC)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-[10px] font-bold uppercase text-slate-400 block">Filter Groep (Section)</label>
+              <select id="admin-group-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-white font-medium">
+                <option value="ALL">Alle groepen</option>
+              </select>
+            </div>
           </div>
 
-          <div>
-            <label class="text-[10px] font-bold uppercase text-slate-400 block">Filter Groep (Section)</label>
-            <select id="admin-group-filter" onchange="renderAdminDashboard()" class="border rounded p-1.5 text-xs bg-white font-medium">
-              <option value="ALL">Alle groepen</option>
-            </select>
+          <div class="flex items-center gap-2 pt-2 sm:pt-0">
+            <button onclick="deleteCurrentGroup()" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-xs font-semibold">
+              Wis geselecteerde groep
+            </button>
+            <button onclick="deleteAllSubmissions()" class="px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold">
+              Wis ALLE afnames
+            </button>
           </div>
         </div>
 
-        <!-- Wisknoppen voor selecties -->
-        <div class="flex items-center gap-2 pt-2 sm:pt-0">
-          <button onclick="deleteCurrentGroup()" id="delete-group-btn" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-xs font-semibold">
-            Wis geselecteerde groep
-          </button>
-          <button onclick="deleteAllSubmissions()" class="px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold">
-            Wis ALLE afnames
-          </button>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          <div class="bg-slate-50 border rounded-lg p-3 text-center">
+            <div class="text-[11px] uppercase font-bold text-slate-400">Afnames</div>
+            <div id="stat-count" class="text-xl font-bold text-indigo-700">0</div>
+          </div>
+          <div class="bg-slate-50 border rounded-lg p-3 text-center">
+            <div class="text-[11px] uppercase font-bold text-slate-400">Gem. Directe Score</div>
+            <div id="stat-avg" class="text-xl font-bold text-indigo-700">0.0</div>
+          </div>
+          <div class="bg-slate-50 border rounded-lg p-3 text-center">
+            <div class="text-[11px] uppercase font-bold text-slate-400">Sterkste Domein</div>
+            <div id="stat-strongest" class="text-xs font-semibold text-slate-700 mt-1 truncate">-</div>
+          </div>
+          <div class="bg-slate-50 border rounded-lg p-3 text-center">
+            <div class="text-[11px] uppercase font-bold text-slate-400" id="stat-reverse-label">Groeipotentieel</div>
+            <div id="stat-growth" class="text-xs font-semibold text-slate-700 mt-1 truncate">-</div>
+          </div>
+        </div>
+
+        <div class="w-full max-w-xl mx-auto mb-8">
+          <canvas id="adminBarChart"></canvas>
+        </div>
+
+        <div class="overflow-x-auto border rounded-lg">
+          <table class="min-w-full text-left text-xs">
+            <thead class="bg-slate-100 uppercase text-slate-600 font-bold border-b">
+              <tr id="admin-table-head-row"></tr>
+            </thead>
+            <tbody id="admin-table-body" class="divide-y text-slate-700"></tbody>
+          </table>
         </div>
       </div>
 
-      <!-- KPI statistieken -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <div class="bg-slate-50 border rounded-lg p-3 text-center">
-          <div class="text-[11px] uppercase font-bold text-slate-400">Afnames</div>
-          <div id="stat-count" class="text-xl font-bold text-indigo-700">0</div>
+      <!-- TAB 2: ITEM-VERGELIJKING FL vs. FC (VOOR VALIDATIE) -->
+      <div id="admin-tab-compare" class="hidden">
+        <div class="bg-indigo-50/60 border border-indigo-200 rounded-xl p-4 mb-6">
+          <h3 class="font-bold text-sm text-indigo-950 mb-1">Item-niveau Vergelijking: Futures Consciousness (FC) vs. Futures Literacy (FL)</h3>
+          <p class="text-xs text-slate-600 mb-3">
+            Vergelijk per item (1 t/m 15) en per controlevraag (R) de exacte antwoorden tussen beide schalen. Selecteer een specifieke deelnemer (die één of beide testen heeft afgelegd) of bekijk het groepsgemiddelde per vraag.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Filter op Groep (Section)</label>
+              <select id="compare-group-select" onchange="onCompareGroupChange()" class="w-full border rounded p-2 text-xs bg-white font-medium">
+                <option value="ALL">Alle groepen</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[10px] font-bold uppercase text-slate-500 block mb-1">Kies Deelnemer of Groepsgemiddelde</label>
+              <select id="compare-user-select" onchange="renderComparisonTable()" class="w-full border rounded p-2 text-xs bg-white font-medium">
+                <option value="GROUP_AVG">-- Toon Gemiddelde van Geselecteerde Groep --</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="bg-slate-50 border rounded-lg p-3 text-center">
-          <div class="text-[11px] uppercase font-bold text-slate-400">Gem. Directe Score</div>
-          <div id="stat-avg" class="text-xl font-bold text-indigo-700">0.0</div>
+
+        <!-- Radarplot Vergelijking FL vs FC -->
+        <div class="w-full max-w-md mx-auto my-6">
+          <canvas id="compareRadarChart"></canvas>
         </div>
-        <div class="bg-slate-50 border rounded-lg p-3 text-center">
-          <div class="text-[11px] uppercase font-bold text-slate-400">Sterkste Domein</div>
-          <div id="stat-strongest" class="text-xs font-semibold text-slate-700 mt-1 truncate">-</div>
+
+        <!-- 1-op-1 Item Vergelijkingstabel -->
+        <div class="overflow-x-auto border rounded-lg">
+          <table class="min-w-full text-left text-xs">
+            <thead class="bg-slate-100 uppercase text-slate-600 font-bold border-b">
+              <tr>
+                <th class="p-2.5 w-16">Item</th>
+                <th class="p-2.5 w-28">Domein</th>
+                <th class="p-2.5 bg-emerald-50/70 text-emerald-900">FC Stelling (Lalot et al., 2024)</th>
+                <th class="p-2.5 w-20 text-center bg-emerald-100/70 text-emerald-950">FC Score</th>
+                <th class="p-2.5 bg-indigo-50/70 text-indigo-900">FL Stelling (Nieuw Voorstel)</th>
+                <th class="p-2.5 w-20 text-center bg-indigo-100/70 text-indigo-950">FL Score</th>
+                <th class="p-2.5 w-20 text-center">Verschil</th>
+              </tr>
+            </thead>
+            <tbody id="compare-items-tbody" class="divide-y text-slate-700"></tbody>
+          </table>
         </div>
-        <div class="bg-slate-50 border rounded-lg p-3 text-center">
-          <div class="text-[11px] uppercase font-bold text-slate-400" id="stat-reverse-label">Groeipotentieel</div>
-          <div id="stat-growth" class="text-xs font-semibold text-slate-700 mt-1 truncate">-</div>
+
+        <!-- Tabel voor de 5 Omgekeerde Controlevragen -->
+        <div class="mt-6">
+          <h4 class="font-bold text-xs uppercase text-amber-900 mb-2">Controlevragen ter Validatie (Enkel bij FL - Omgekeerd geformuleerd)</h4>
+          <div class="overflow-x-auto border border-amber-200 rounded-lg">
+            <table class="min-w-full text-left text-xs">
+              <thead class="bg-amber-50 uppercase text-amber-900 font-bold border-b border-amber-200">
+                <tr>
+                  <th class="p-2.5 w-20">Code</th>
+                  <th class="p-2.5 w-36">Domein</th>
+                  <th class="p-2.5">Omgekeerde Stelling (Schijnzekerheid / Determinisme)</th>
+                  <th class="p-2.5 w-28 text-center">Ruwe Score (1-5)</th>
+                  <th class="p-2.5 w-32 text-center">Geïnverteerd (6 - Score)</th>
+                </tr>
+              </thead>
+              <tbody id="compare-reverse-tbody" class="divide-y divide-amber-100 text-slate-700"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- Cohort Bar Chart (Dubbele kolommen bij FL) -->
-      <div class="w-full max-w-xl mx-auto mb-8">
-        <canvas id="adminBarChart"></canvas>
+      <!-- TAB 3: GEBRUIKERSBEHEER -->
+      <div id="admin-tab-users" class="hidden">
+        <div class="p-4 bg-indigo-50/50 border border-indigo-200 rounded-xl mb-6">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="font-bold text-sm text-indigo-950">Geregistreerde gebruikers importeren</h3>
+            <button onclick="deleteUsersDatabase()" class="text-[11px] text-red-600 hover:underline font-semibold">
+              Wis alle geregistreerde accounts
+            </button>
+          </div>
+          <p class="text-xs text-slate-600 mb-3">
+            Upload een bestand (<strong>.csv, .xlsx, .xls, of .ods</strong>) met kolommen: <code>User</code>, <code>ID</code> en <code>Section</code>. Bestaande gebruikers en hun resultaten blijven bewaard.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center gap-3">
+            <input type="file" id="user-file-input" accept=".csv, .xlsx, .xls, .ods" class="text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+            <button onclick="handleFileUpload()" id="upload-btn" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-bold w-full sm:w-auto">
+              Opladen & Opslaan
+            </button>
+          </div>
+          <div id="upload-status" class="text-xs mt-2 font-medium"></div>
+        </div>
       </div>
 
-      <!-- Tabel met dossiers en individuele wisknop -->
-      <div class="overflow-x-auto border rounded-lg">
-        <table class="min-w-full text-left text-xs">
-          <thead class="bg-slate-100 uppercase text-slate-600 font-bold border-b">
-            <tr id="admin-table-head-row">
-              <th class="p-2.5">Deelnemer</th>
-              <th class="p-2.5">ID</th>
-              <th class="p-2.5">Groep</th>
-              <th class="p-2.5">Datum & Tijd</th>
-              <th class="p-2.5 text-center">Tijd</th>
-              <th class="p-2.5 text-center">Agency</th>
-              <th class="p-2.5 text-center">Openheid</th>
-              <th class="p-2.5 text-center">Systeem</th>
-              <th class="p-2.5 text-center">Ethiek</th>
-              <th class="p-2.5 text-center">Gem.</th>
-              <th class="p-2.5 text-right">Acties</th>
-            </tr>
-          </thead>
-          <tbody id="admin-table-body" class="divide-y text-slate-700"></tbody>
-        </table>
-      </div>
     </section>
 
   </main>
@@ -300,6 +386,7 @@
 
     let radarChartInstance = null;
     let barChartInstance = null;
+    let compareRadarInstance = null;
 
     const domainDefinitions = {
       FL: {
@@ -320,50 +407,50 @@
 
     // 1. FUTURES LITERACY ITEMS (15 direct + 5 omgekeerde controlevragen)
     const itemsFL = [
-      { id: "FL_TP_01", domain: "temporal", isReverse: false, text: "Als ik nadenk over de toekomst, bedenk ik meer dan één manier waarop die eruit kan zien." },
-      { id: "FL_TP_02", domain: "temporal", isReverse: false, text: "Bij het maken van een beslissing sta ik stil bij welk beeld van de toekomst ik in mijn hoofd heb." },
-      { id: "FL_TP_03", domain: "temporal", isReverse: false, text: "Ik merk dat wat ik over later verwacht, invloed heeft op wat ik elke dag doe." },
+      { id: "FL_TP_01", shortKey: "TP1", domain: "temporal", isReverse: false, text: "Als ik nadenk over de toekomst, bedenk ik meer dan één manier waarop die eruit kan zien." },
+      { id: "FL_TP_02", shortKey: "TP2", domain: "temporal", isReverse: false, text: "Bij het maken van een beslissing sta ik stil bij welk beeld van de toekomst ik in mijn hoofd heb." },
+      { id: "FL_TP_03", shortKey: "TP3", domain: "temporal", isReverse: false, text: "Ik merk dat wat ik over later verwacht, invloed heeft op wat ik elke dag doe." },
 
-      { id: "FL_AB_01", domain: "agency", isReverse: false, text: "Ik geloof dat ik zelf kan kiezen hoe ik naar de toekomst kijk." },
-      { id: "FL_AB_02", domain: "agency", isReverse: false, text: "Ik besef dat hoe ik mijn toekomst zie, gekleurd wordt door hoe ik me nu voel." },
-      { id: "FL_AB_03", domain: "agency", isReverse: false, text: "Zelfs als de toekomst onzeker is, zie ik dat als ruimte om nieuwe mogelijkheden te bedenken." },
+      { id: "FL_AB_01", shortKey: "AB1", domain: "agency", isReverse: false, text: "Ik geloof dat ik zelf kan kiezen hoe ik naar de toekomst kijk." },
+      { id: "FL_AB_02", shortKey: "AB2", domain: "agency", isReverse: false, text: "Ik besef dat hoe ik mijn toekomst zie, gekleurd wordt door hoe ik me nu voel." },
+      { id: "FL_AB_03", shortKey: "AB3", domain: "agency", isReverse: false, text: "Zelfs als de toekomst onzeker is, zie ik dat als ruimte om nieuwe mogelijkheden te bedenken." },
 
-      { id: "FL_OA_01", domain: "reframing", isReverse: false, text: "Ik gebruik vaak nieuwe ideeën om mijn beeld van de toekomst bij te stellen." },
-      { id: "FL_OA_02", domain: "reframing", isReverse: false, text: "Ik laat me graag inspireren door toekomstbeelden die anders zijn dan wat ik zelf verwacht." },
-      { id: "FL_OA_03", domain: "reframing", isReverse: false, text: "Ik vind het leuk om me een toekomst voor te stellen die helemaal anders is dan vandaag." },
+      { id: "FL_OA_01", shortKey: "OA1", domain: "reframing", isReverse: false, text: "Ik gebruik vaak nieuwe ideeën om mijn beeld van de toekomst bij te stellen." },
+      { id: "FL_OA_02", shortKey: "OA2", domain: "reframing", isReverse: false, text: "Ik laat me graag inspireren door toekomstbeelden die anders zijn dan wat ik zelf verwacht." },
+      { id: "FL_OA_03", shortKey: "OA3", domain: "reframing", isReverse: false, text: "Ik vind het leuk om me een toekomst voor te stellen die helemaal anders is dan vandaag." },
 
-      { id: "FL_SP_01", domain: "systems", isReverse: false, text: "Ik geloof dat een kleine verandering vandaag op een of andere manier grote gevolgen kan hebben voor later." },
-      { id: "FL_SP_02", domain: "systems", isReverse: false, text: "Als ik me de toekomst voorstel, denk ik na over hoe klimaat, technologie en onderwijs elkaar kunnen veranderen." },
-      { id: "FL_SP_03", domain: "systems", isReverse: false, text: "Als ik iets nieuws bedenk, vraag ik me af welke onverwachte gevolgen het later kan hebben." },
+      { id: "FL_SP_01", shortKey: "SP1", domain: "systems", isReverse: false, text: "Ik geloof dat een kleine verandering vandaag op een of andere manier grote gevolgen kan hebben voor later." },
+      { id: "FL_SP_02", shortKey: "SP2", domain: "systems", isReverse: false, text: "Als ik me de toekomst voorstel, denk ik na over hoe klimaat, technologie en onderwijs elkaar kunnen veranderen." },
+      { id: "FL_SP_03", shortKey: "SP3", domain: "systems", isReverse: false, text: "Als ik iets nieuws bedenk, vraag ik me af welke onverwachte gevolgen het later kan hebben." },
 
-      { id: "FL_CO_01", domain: "ethics", isReverse: false, text: "Ik wil graag weten hoe mensen van over de hele wereld naar hun toekomst kijken." },
-      { id: "FL_CO_02", domain: "ethics", isReverse: false, text: "Ik probeer altijd te begrijpen waarom iemand anders een andere toekomst wenst dan ik." },
-      { id: "FL_CO_03", domain: "ethics", isReverse: false, text: "Als ik me een betere toekomst voorstel, vraag ik me af voor wie die beter zou zijn en voor wie niet." },
+      { id: "FL_CO_01", shortKey: "CO1", domain: "ethics", isReverse: false, text: "Ik wil graag weten hoe mensen van over de hele wereld naar hun toekomst kijken." },
+      { id: "FL_CO_02", shortKey: "CO2", domain: "ethics", isReverse: false, text: "Ik probeer altijd te begrijpen waarom iemand anders een andere toekomst wenst dan ik." },
+      { id: "FL_CO_03", shortKey: "CO3", domain: "ethics", isReverse: false, text: "Als ik me een betere toekomst voorstel, vraag ik me af voor wie die beter zou zijn en voor wie niet." },
 
-      { id: "FL_TP_R", domain: "temporal", isReverse: true, text: "Ik weet eigenlijk al hoe mijn toekomst eruit zal zien." },
-      { id: "FL_AB_R", domain: "agency", isReverse: true, text: "Nadenken over de toekomst heeft weinig zin, het loopt toch zoals het loopt." },
-      { id: "FL_OA_R", domain: "reframing", isReverse: true, text: "Toekomstbeelden die heel anders zijn dan nu, vind ik meestal onrealistisch." },
-      { id: "FL_SP_R", domain: "systems", isReverse: true, text: "Als ik iets verander, weet ik meestal precies welke gevolgen dat zal hebben." },
-      { id: "FL_CO_R", domain: "ethics", isReverse: true, text: "Hoe anderen hun toekomst zien, heeft weinig met mijn toekomst te maken." }
+      { id: "FL_TP_R", shortKey: "TP-R", domain: "temporal", isReverse: true, text: "Ik weet eigenlijk al hoe mijn toekomst eruit zal zien." },
+      { id: "FL_AB_R", shortKey: "AB-R", domain: "agency", isReverse: true, text: "Nadenken over de toekomst heeft weinig zin, het loopt toch zoals het loopt." },
+      { id: "FL_OA_R", shortKey: "OA-R", domain: "reframing", isReverse: true, text: "Toekomstbeelden die heel anders zijn dan nu, vind ik meestal onrealistisch." },
+      { id: "FL_SP_R", shortKey: "SP-R", domain: "systems", isReverse: true, text: "Als ik iets verander, weet ik meestal precies welke gevolgen dat zal hebben." },
+      { id: "FL_CO_R", shortKey: "CO-R", domain: "ethics", isReverse: true, text: "Hoe anderen hun toekomst zien, heeft weinig met mijn toekomst te maken." }
     ];
 
-    // 2. Gevalideerde Futures Consciousness Items (Lalot et al., 2024)[cite: 8]
+    // 2. Gevalideerde Futures Consciousness Items (Lalot et al., 2024)
     const itemsFC = [
-      { id: "FC_TP_01", domain: "temporal", isReverse: false, text: "Ik denk na over hoe de toekomst er mogelijk uit gaat zien." },
-      { id: "FC_TP_02", domain: "temporal", isReverse: false, text: "Bij het maken van een beslissing denk ik na over hoe het mijn toekomst kan beïnvloeden." },
-      { id: "FC_TP_03", domain: "temporal", isReverse: false, text: "Ik probeer de toekomst te beïnvloeden door mijn dagelijkse gedrag." },
-      { id: "FC_AB_01", domain: "agency", isReverse: false, text: "Ik geloof dat ik in alles kan slagen als ik me ertoe zet." },
-      { id: "FC_AB_02", domain: "agency", isReverse: false, text: "Ik ben altijd optimistisch over mijn toekomst." },
-      { id: "FC_AB_03", domain: "agency", isReverse: false, text: "Zelfs als dingen moeilijk zijn red ik me wel." },
-      { id: "FC_OA_01", domain: "reframing", isReverse: false, text: "Ik gebruik vaak nieuwe ideeën om wat ik doe te verbeteren." },
-      { id: "FC_OA_02", domain: "reframing", isReverse: false, text: "Ik laat me graag inspireren door nieuwe ideeën." },
-      { id: "FC_OA_03", domain: "reframing", isReverse: false, text: "Ik vind het leuk om dingen anders te doen dan anders." },
-      { id: "FC_SP_01", domain: "systems", isReverse: false, text: "Ik geloof dat alles in het universum op een of andere manier met elkaar verbonden is." },
-      { id: "FC_SP_02", domain: "systems", isReverse: false, text: "Ik denk dat alles, van klimaat tot technologie tot onderwijs, verbonden is met elkaar." },
-      { id: "FC_SP_03", domain: "systems", isReverse: false, text: "Ik heb vaak het gevoel dat ik onderdeel ben van de natuur." },
-      { id: "FC_CO_01", domain: "ethics", isReverse: false, text: "Ik wil graag mensen helpen, van over de hele wereld, als ze in nood zijn." },
-      { id: "FC_CO_02", domain: "ethics", isReverse: false, text: "Ik probeer altijd oprecht, hulpvaardig en vergevingsgezind te zijn." },
-      { id: "FC_CO_03", domain: "ethics", isReverse: false, text: "Ik probeer bij te dragen aan gelijkheid, rechtvaardigheid, duurzaamheid en een wereld zonder oorlog." }
+      { id: "FC_TP_01", shortKey: "TP1", domain: "temporal", isReverse: false, text: "Ik denk na over hoe de toekomst er mogelijk uit gaat zien." },
+      { id: "FC_TP_02", shortKey: "TP2", domain: "temporal", isReverse: false, text: "Bij het maken van een beslissing denk ik na over hoe het mijn toekomst kan beïnvloeden." },
+      { id: "FC_TP_03", shortKey: "TP3", domain: "temporal", isReverse: false, text: "Ik probeer de toekomst te beïnvloeden door mijn dagelijkse gedrag." },
+      { id: "FC_AB_01", shortKey: "AB1", domain: "agency", isReverse: false, text: "Ik geloof dat ik in alles kan slagen als ik me ertoe zet." },
+      { id: "FC_AB_02", shortKey: "AB2", domain: "agency", isReverse: false, text: "Ik ben altijd optimistisch over mijn toekomst." },
+      { id: "FC_AB_03", shortKey: "AB3", domain: "agency", isReverse: false, text: "Zelfs als dingen moeilijk zijn red ik me wel." },
+      { id: "FC_OA_01", shortKey: "OA1", domain: "reframing", isReverse: false, text: "Ik gebruik vaak nieuwe ideeën om wat ik doe te verbeteren." },
+      { id: "FC_OA_02", shortKey: "OA2", domain: "reframing", isReverse: false, text: "Ik laat me graag inspireren door nieuwe ideeën." },
+      { id: "FC_OA_03", shortKey: "OA3", domain: "reframing", isReverse: false, text: "Ik vind het leuk om dingen anders te doen dan anders." },
+      { id: "FC_SP_01", shortKey: "SP1", domain: "systems", isReverse: false, text: "Ik geloof dat alles in het universum op een of andere manier met elkaar verbonden is." },
+      { id: "FC_SP_02", shortKey: "SP2", domain: "systems", isReverse: false, text: "Ik denk dat alles, van klimaat tot technologie tot onderwijs, verbonden is met elkaar." },
+      { id: "FC_SP_03", shortKey: "SP3", domain: "systems", isReverse: false, text: "Ik heb vaak het gevoel dat ik onderdeel ben van de natuur." },
+      { id: "FC_CO_01", shortKey: "CO1", domain: "ethics", isReverse: false, text: "Ik wil graag mensen helpen, van over de hele wereld, als ze in nood zijn." },
+      { id: "FC_CO_02", shortKey: "CO2", domain: "ethics", isReverse: false, text: "Ik probeer altijd oprecht, hulpvaardig en vergevingsgezind te zijn." },
+      { id: "FC_CO_03", shortKey: "CO3", domain: "ethics", isReverse: false, text: "Ik probeer bij te dragen aan gelijkheid, rechtvaardigheid, duurzaamheid en een wereld zonder oorlog." }
     ];
 
     function showView(viewId) {
@@ -371,6 +458,23 @@
         document.getElementById(id).classList.add('hidden');
       });
       document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    function switchAdminTab(tabName) {
+      ['cohort', 'compare', 'users'].forEach(t => {
+        document.getElementById(`admin-tab-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-btn-${t}`);
+        btn.classList.remove('border-indigo-600', 'text-indigo-700');
+        btn.classList.add('border-transparent', 'text-slate-500');
+      });
+      document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+      activeBtn.classList.remove('border-transparent', 'text-slate-500');
+      activeBtn.classList.add('border-indigo-600', 'text-indigo-700');
+
+      if (tabName === 'compare') {
+        initComparisonTab();
+      }
     }
 
     function startNewSession() {
@@ -540,9 +644,11 @@
       const domainSums = { temporal: 0, agency: 0, reframing: 0, systems: 0, ethics: 0 };
       const domainCounts = { temporal: 0, agency: 0, reframing: 0, systems: 0, ethics: 0 };
       const reverseScores = {};
+      const answers = {};
 
       items.forEach(q => {
         const val = parseInt(document.querySelector(`input[name="${q.id}"]:checked`).value, 10);
+        answers[q.id] = val; // Sla elk individueel antwoord op onder het item-ID
         if (q.isReverse) {
           reverseScores[q.domain] = val;
         } else {
@@ -560,7 +666,8 @@
         studentId: currentSession.user.studentId,
         testType: currentSession.testType,
         scores,
-        reverseScores: isFL ? reverseScores : null
+        reverseScores: isFL ? reverseScores : null,
+        answers
       };
 
       try {
@@ -682,6 +789,27 @@
           </div>
         `;
       }).join('');
+
+      // Toon individuele item-antwoorden als die opgeslagen zijn
+      const itemSection = document.getElementById('individual-answers-section');
+      const itemTbody = document.getElementById('individual-answers-tbody');
+      if (sub.answers && Object.keys(sub.answers).length > 0) {
+        itemSection.classList.remove('hidden');
+        const list = isFL ? itemsFL : itemsFC;
+        itemTbody.innerHTML = list.map(q => {
+          const val = sub.answers[q.id] !== undefined ? sub.answers[q.id] : '-';
+          return `
+            <tr class="${q.isReverse ? 'bg-amber-50/60' : 'hover:bg-slate-50'}">
+              <td class="p-2 font-mono font-bold text-slate-600">${q.shortKey}</td>
+              <td class="p-2 text-slate-500">${meta[q.domain].name}</td>
+              <td class="p-2 text-slate-800">${q.text} ${q.isReverse ? '<span class="text-[10px] font-bold text-amber-700 ml-1">(Omgekeerd)</span>' : ''}</td>
+              <td class="p-2 text-center font-bold ${q.isReverse ? 'text-amber-700' : 'text-indigo-700'}">${val}</td>
+            </tr>
+          `;
+        }).join('');
+      } else {
+        itemSection.classList.add('hidden');
+      }
 
       showView('result-view');
     }
@@ -807,9 +935,6 @@
       }
     }
 
-    // ------------------------------------------------------------------------
-    // WISMETHODEN
-    // ------------------------------------------------------------------------
     async function deleteSingleSubmission(id) {
       if (!confirm("Weet je zeker dat je deze testafname definitief wilt verwijderen?")) return;
 
@@ -832,7 +957,7 @@
         return;
       }
 
-      if (!confirm(`Weet je zeker dat je ALLE testinzendingen van de groep '${selectedGroup}' wilt wissen? Dit kan niet ongedaan worden gemaakt.`)) {
+      if (!confirm(`Weet je zeker dat je ALLE testinzendingen van de groep '${selectedGroup}' wilt wissen?`)) {
         return;
       }
 
@@ -882,7 +1007,7 @@
     }
 
     // ------------------------------------------------------------------------
-    // DASHBOARD RENDERING MET REVERSE VERWERKING
+    // TAB 1: COHORT DASHBOARD RENDERING
     // ------------------------------------------------------------------------
     function renderAdminDashboard() {
       if (!isAdminAuthenticated) return;
@@ -906,7 +1031,6 @@
 
       document.getElementById('stat-count').innerText = finalFiltered.length;
 
-      // Update tabel header afhankelijk van FL of FC
       const theadRow = document.getElementById('admin-table-head-row');
       theadRow.innerHTML = `
         <th class="p-2.5">Deelnemer</th>
@@ -961,7 +1085,6 @@
         document.getElementById('stat-growth').innerText = meta[sorted[sorted.length - 1]].name;
       }
 
-      // Bar Chart met dubbele staven voor FL
       if (barChartInstance) barChartInstance.destroy();
       const ctx = document.getElementById('adminBarChart').getContext('2d');
 
@@ -991,17 +1114,11 @@
         },
         options: {
           responsive: true,
-          plugins: { 
-            legend: { 
-              display: isFL, 
-              position: 'bottom' 
-            } 
-          },
+          plugins: { legend: { display: isFL, position: 'bottom' } },
           scales: { y: { min: 0, max: 5, ticks: { stepSize: 1 } } }
         }
       });
 
-      // Tabelrijen opbouwen met actieknoppen en R-scores
       document.getElementById('admin-table-body').innerHTML = finalFiltered.map(s => {
         const rowAvg = (Object.values(s.scores).reduce((a,b)=>a+b,0) / keys.length).toFixed(2);
         const rev = s.reverseScores || {};
@@ -1030,7 +1147,7 @@
             <td class="p-2.5 text-center font-bold text-indigo-700">${rowAvg}</td>
             <td class="p-2.5 text-right whitespace-nowrap">
               <button onclick='renderRadar(${JSON.stringify(s)}, true)' class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-medium text-[11px] mr-1">
-                Fiche
+                Fiche & Items
               </button>
               <button onclick="deleteSingleSubmission('${id}')" class="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded font-medium text-[11px]" title="Verwijder afname">
                 ✕
@@ -1041,23 +1158,247 @@
       }).join('');
     }
 
+    // ------------------------------------------------------------------------
+    // TAB 2: ITEM-VERGELIJKING FL vs. FC (VOOR VALIDATIE)
+    // ------------------------------------------------------------------------
+    function initComparisonTab() {
+      const allSections = [...new Set(cachedAdminSubmissions.map(s => s.section))].sort();
+      const groupSel = document.getElementById('compare-group-select');
+      const currentVal = groupSel.value;
+
+      groupSel.innerHTML = '<option value="ALL">Alle groepen</option>' +
+        allSections.map(sec => `<option value="${sec}">${sec}</option>`).join('');
+      if (allSections.includes(currentVal)) groupSel.value = currentVal;
+
+      onCompareGroupChange();
+    }
+
+    function onCompareGroupChange() {
+      const selectedSection = document.getElementById('compare-group-select').value;
+      const filteredSubs = selectedSection === 'ALL'
+        ? cachedAdminSubmissions
+        : cachedAdminSubmissions.filter(s => s.section === selectedSection);
+
+      // Unieke studenten vinden in deze selectie
+      const userMap = {};
+      filteredSubs.forEach(s => {
+        if (!userMap[s.studentId]) {
+          userMap[s.studentId] = { studentId: s.studentId, userName: s.userName, section: s.section, hasFL: false, hasFC: false };
+        }
+        if (s.testType === 'FL') userMap[s.studentId].hasFL = true;
+        if (s.testType === 'FC') userMap[s.studentId].hasFC = true;
+      });
+
+      const userList = Object.values(userMap).sort((a,b) => a.userName.localeCompare(b.userName));
+      const userSel = document.getElementById('compare-user-select');
+      userSel.innerHTML = '<option value="GROUP_AVG">-- Toon Gemiddelde van Geselecteerde Groep --</option>' +
+        userList.map(u => {
+          const badges = [u.hasFC ? 'FC' : '', u.hasFL ? 'FL' : ''].filter(Boolean).join(' + ');
+          return `<option value="${u.studentId}">${u.userName} (${u.studentId}) [${badges}]</option>`;
+        }).join('');
+
+      renderComparisonTable();
+    }
+
+    function renderComparisonTable() {
+      const selectedSection = document.getElementById('compare-group-select').value;
+      const selectedUser = document.getElementById('compare-user-select').value;
+
+      let flSubs = cachedAdminSubmissions.filter(s => s.testType === 'FL');
+      let fcSubs = cachedAdminSubmissions.filter(s => s.testType === 'FC');
+
+      if (selectedSection !== 'ALL') {
+        flSubs = flSubs.filter(s => s.section === selectedSection);
+        fcSubs = fcSubs.filter(s => s.section === selectedSection);
+      }
+
+      if (selectedUser !== 'GROUP_AVG') {
+        // Neem de meest recente FL en meest recente FC van deze specifieke gebruiker
+        flSubs = flSubs.filter(s => s.studentId === selectedUser).slice(0, 1);
+        fcSubs = fcSubs.filter(s => s.studentId === selectedUser).slice(0, 1);
+      }
+
+      // Helper om gemiddelde of individuele score op een specifiek item-ID te berekenen
+      const getItemScore = (subsArray, itemId) => {
+        const validVals = subsArray
+          .map(s => (s.answers && s.answers[itemId] !== undefined) ? Number(s.answers[itemId]) : null)
+          .filter(v => v !== null && !isNaN(v));
+        if (validVals.length === 0) return null;
+        const sum = validVals.reduce((a,b) => a + b, 0);
+        return +(sum / validVals.length).toFixed(2);
+      };
+
+      // Helper voor domeinscores voor de vergelijkende radarplot
+      const getDomainScore = (subsArray, domainKey, isRev = false) => {
+        const validVals = subsArray
+          .map(s => {
+            if (isRev) return (s.reverseScores && s.reverseScores[domainKey] !== undefined) ? Number(s.reverseScores[domainKey]) : null;
+            return (s.scores && s.scores[domainKey] !== undefined) ? Number(s.scores[domainKey]) : null;
+          })
+          .filter(v => v !== null && !isNaN(v));
+        if (validVals.length === 0) return 0;
+        return +(validVals.reduce((a,b) => a + b, 0) / validVals.length).toFixed(2);
+      };
+
+      // 1. Teken gecombineerde Radar Chart (FC vs FL Direct vs FL Reverse)
+      const keys = ["temporal", "agency", "reframing", "systems", "ethics"];
+      const labels = keys.map(k => domainDefinitions.FL[k].name);
+
+      if (compareRadarInstance) compareRadarInstance.destroy();
+      const ctx = document.getElementById('compareRadarChart').getContext('2d');
+      compareRadarInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Futures Consciousness (FC)',
+              data: keys.map(k => getDomainScore(fcSubs, k, false)),
+              backgroundColor: 'rgba(16, 185, 129, 0.2)',
+              borderColor: 'rgb(16, 185, 129)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgb(16, 185, 129)'
+            },
+            {
+              label: 'Futures Literacy (FL Direct)',
+              data: keys.map(k => getDomainScore(flSubs, k, false)),
+              backgroundColor: 'rgba(79, 70, 229, 0.2)',
+              borderColor: 'rgb(79, 70, 229)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgb(79, 70, 229)'
+            },
+            {
+              label: 'FL Controlevragen (Schijnzekerheid R)',
+              data: keys.map(k => getDomainScore(flSubs, k, true)),
+              backgroundColor: 'rgba(217, 119, 6, 0.1)',
+              borderColor: 'rgb(217, 119, 6)',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              pointBackgroundColor: 'rgb(217, 119, 6)'
+            }
+          ]
+        },
+        options: {
+          scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, display: false } } },
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+
+      // 2. Bouw 1-op-1 item tabel (15 reguliere items)
+      const directFL = itemsFL.filter(i => !i.isReverse);
+      const tbody = document.getElementById('compare-items-tbody');
+
+      tbody.innerHTML = directFL.map((flItem, idx) => {
+        const fcItem = itemsFC[idx];
+        const fcScore = getItemScore(fcSubs, fcItem.id);
+        const flScore = getItemScore(flSubs, flItem.id);
+
+        let diffHtml = '<span class="text-slate-400">-</span>';
+        if (fcScore !== null && flScore !== null) {
+          const diff = +(flScore - fcScore).toFixed(2);
+          const sign = diff > 0 ? '+' : '';
+          const color = diff > 0 ? 'text-indigo-700 font-bold' : (diff < 0 ? 'text-amber-700 font-bold' : 'text-slate-500');
+          diffHtml = `<span class="${color}">${sign}${diff}</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="p-2.5 font-mono font-bold text-slate-700">${flItem.shortKey}</td>
+            <td class="p-2.5 text-slate-500">${domainDefinitions.FL[flItem.domain].name.split(" ")[0]}</td>
+            <td class="p-2.5 bg-emerald-50/30 text-slate-700">${fcItem.text}</td>
+            <td class="p-2.5 text-center font-bold bg-emerald-50/60 text-emerald-800">${fcScore !== null ? fcScore : '-'}</td>
+            <td class="p-2.5 bg-indigo-50/30 text-slate-700">${flItem.text}</td>
+            <td class="p-2.5 text-center font-bold bg-indigo-50/60 text-indigo-800">${flScore !== null ? flScore : '-'}</td>
+            <td class="p-2.5 text-center">${diffHtml}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // 3. Bouw tabel voor de 5 Omgekeerde Controlevragen
+      const reverseFL = itemsFL.filter(i => i.isReverse);
+      const revTbody = document.getElementById('compare-reverse-tbody');
+
+      revTbody.innerHTML = reverseFL.map(rItem => {
+        // Indien individuele answers beschikbaar zijn, haal uit answers; anders fallback op reverseScores per domein
+        let rawScore = getItemScore(flSubs, rItem.id);
+        if (rawScore === null) {
+          const domScore = getDomainScore(flSubs, rItem.domain, true);
+          rawScore = domScore > 0 ? domScore : null;
+        }
+        const inverted = rawScore !== null ? +(6 - rawScore).toFixed(2) : null;
+
+        return `
+          <tr class="hover:bg-amber-50/40">
+            <td class="p-2.5 font-mono font-bold text-amber-900">${rItem.shortKey}</td>
+            <td class="p-2.5 text-slate-600">${domainDefinitions.FL[rItem.domain].name}</td>
+            <td class="p-2.5 text-slate-800">${rItem.text}</td>
+            <td class="p-2.5 text-center font-bold text-amber-800">${rawScore !== null ? rawScore : '-'}</td>
+            <td class="p-2.5 text-center font-bold text-indigo-700">${inverted !== null ? inverted : '-'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ------------------------------------------------------------------------
+    // VOLLEDIGE CSV EXPORT (INCLUSIEF ALLE 35 INDIVIDUELE VRAGEN)
+    // ------------------------------------------------------------------------
     function exportToCSV() {
       if (cachedAdminSubmissions.length === 0) {
         alert("Geen data om te exporteren.");
         return;
       }
 
-      let csv = "ID,Datum,Tijdstip,Student_ID,Naam,Groep,Schaal,Temporeel,Agency,Reframing_Openheid,Systemen,Ethiek_Anderen,Gemiddelde,TP_Rev,AB_Rev,OA_Rev,SP_Rev,CO_Rev\n";
+      const flKeys = itemsFL.map(q => q.id);
+      const fcKeys = itemsFC.map(q => q.id);
+
+      const baseHeaders = [
+        "ID", "Datum", "Tijdstip", "Student_ID", "Naam", "Groep", "Schaal",
+        "Temporeel_Gem", "Agency_Gem", "Reframing_Openheid_Gem", "Systemen_Gem", "Ethiek_Anderen_Gem", "Totaal_Gemiddelde",
+        "TP_Rev", "AB_Rev", "OA_Rev", "SP_Rev", "CO_Rev"
+      ];
+
+      const allHeaders = [...baseHeaders, ...flKeys, ...fcKeys];
+      let csv = "﻿" + allHeaders.join(",") + "
+";
+
       cachedAdminSubmissions.forEach(s => {
         const rowAvg = (Object.values(s.scores).reduce((a,b)=>a+b,0) / 5).toFixed(2);
         const rev = s.reverseScores || {};
-        csv += `"${s._id || s.id}","${s.dateStr || ''}","${s.timeStr || ''}","${s.studentId}","${s.userName}","${s.section}","${s.testType}",${s.scores.temporal},${s.scores.agency},${s.scores.reframing},${s.scores.systems},${s.scores.ethics},${rowAvg},${rev.temporal || ''},${rev.agency || ''},${rev.reframing || ''},${rev.systems || ''},${rev.ethics || ''}\n`;
+        const ans = s.answers || {};
+
+        const baseCols = [
+          `"${s._id || s.id}"`,
+          `"${s.dateStr || ''}"`,
+          `"${s.timeStr || ''}"`,
+          `"${s.studentId}"`,
+          `"${s.userName}"`,
+          `"${s.section}"`,
+          `"${s.testType}"`,
+          s.scores.temporal,
+          s.scores.agency,
+          s.scores.reframing,
+          s.scores.systems,
+          s.scores.ethics,
+          rowAvg,
+          rev.temporal !== undefined ? rev.temporal : "",
+          rev.agency !== undefined ? rev.agency : "",
+          rev.reframing !== undefined ? rev.reframing : "",
+          rev.systems !== undefined ? rev.systems : "",
+          rev.ethics !== undefined ? rev.ethics : ""
+        ];
+
+        // Voeg individuele antwoorden op alle FL-items en FC-items toe
+        const flCols = flKeys.map(k => ans[k] !== undefined ? ans[k] : "");
+        const fcCols = fcKeys.map(k => ans[k] !== undefined ? ans[k] : "");
+
+        csv += [...baseCols, ...flCols, ...fcCols].join(",") + "
+";
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.setAttribute("download", `futures_data_${new Date().toISOString().slice(0,10)}.csv`);
+      link.setAttribute("download", `futures_validatie_export_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
