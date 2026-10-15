@@ -484,8 +484,12 @@
 
     async function loadUsers() {
       try {
-        const res = await fetch('/.netlify/functions/submissions/users');
-        registeredUsers = await res.json();
+        const res = await fetch('/.netlify/functions/submissions?action=users');
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) {
+          throw new Error(data.error || "Kon gebruikers niet ophalen (HTTP " + res.status + ")");
+        }
+        registeredUsers = data;
 
         const indicator = document.getElementById('loading-users-indicator');
         const form = document.getElementById('onboarding-form');
@@ -552,7 +556,7 @@
       showView('user-history-view');
 
       try {
-        const res = await fetch(`/.netlify/functions/submissions/user-history/${encodeURIComponent(studentId)}`);
+        const res = await fetch(`/.netlify/functions/submissions?action=user-history&studentId=${encodeURIComponent(studentId)}`);
         const history = await res.json();
 
         if (history.length === 0) {
@@ -839,7 +843,7 @@
 
     async function fetchAdminData() {
       try {
-        const res = await fetch('/.netlify/functions/submissions/admin/submissions', {
+        const res = await fetch('/.netlify/functions/submissions?action=admin_submissions', {
           method: 'GET',
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
@@ -912,7 +916,7 @@
           return { User: userVal, ID: idVal, Section: sectionVal };
         }).filter(u => u.User && u.ID && u.Section);
 
-        const res = await fetch('/.netlify/functions/submissions/admin/import-users', {
+        const res = await fetch('/.netlify/functions/submissions?action=admin_import_users', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -939,7 +943,7 @@
       if (!confirm("Weet je zeker dat je deze testafname definitief wilt verwijderen?")) return;
 
       try {
-        const res = await fetch(`/.netlify/functions/submissions/admin?id=${encodeURIComponent(id)}`, {
+        const res = await fetch(`/.netlify/functions/submissions?action=admin_delete&id=${encodeURIComponent(id)}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
@@ -962,7 +966,7 @@
       }
 
       try {
-        const res = await fetch(`/.netlify/functions/submissions/admin?section=${encodeURIComponent(selectedGroup)}`, {
+        const res = await fetch(`/.netlify/functions/submissions?action=admin_delete&section=${encodeURIComponent(selectedGroup)}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
@@ -978,7 +982,7 @@
       if (check !== "VERWIJDER") return;
 
       try {
-        const res = await fetch('/.netlify/functions/submissions/admin?allSubmissions=true', {
+        const res = await fetch('/.netlify/functions/submissions?action=admin_delete&allSubmissions=true', {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
@@ -994,7 +998,7 @@
       if (check !== "WIS GEBRUIKERS") return;
 
       try {
-        const res = await fetch('/.netlify/functions/submissions/admin?clearUsers=true', {
+        const res = await fetch('/.netlify/functions/submissions?action=admin_delete&clearUsers=true', {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
@@ -1358,8 +1362,7 @@
       ];
 
       const allHeaders = [...baseHeaders, ...flKeys, ...fcKeys];
-      let csv = "﻿" + allHeaders.join(",") + "
-";
+      let csv = "\uFEFF" + allHeaders.join(",") + "\n";
 
       cachedAdminSubmissions.forEach(s => {
         const rowAvg = (Object.values(s.scores).reduce((a,b)=>a+b,0) / 5).toFixed(2);
@@ -1391,8 +1394,7 @@
         const flCols = flKeys.map(k => ans[k] !== undefined ? ans[k] : "");
         const fcCols = fcKeys.map(k => ans[k] !== undefined ? ans[k] : "");
 
-        csv += [...baseCols, ...flCols, ...fcCols].join(",") + "
-";
+        csv += [...baseCols, ...flCols, ...fcCols].join(",") + "\n";
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
