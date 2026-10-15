@@ -7,6 +7,9 @@ let cachedClient = null;
 
 async function connectToDatabase() {
   if (cachedClient) return cachedClient;
+  if (!uri) {
+    throw new Error("MONGODB_URI omgevingsvariabele ontbreekt in Netlify.");
+  }
   const client = new MongoClient(uri);
   await client.connect();
   cachedClient = client;
@@ -34,11 +37,13 @@ exports.handler = async (event) => {
     const rawAuth = event.headers.authorization || event.headers.Authorization || "";
     const token = rawAuth.replace(/^Bearer\s+/i, "").trim();
     const fullPath = event.path || "";
+    const params = event.queryStringParameters || {};
+    const action = params.action || "";
 
     // ------------------------------------------------------------------------
-    // 1. BEHEERDERS ENDPOINTS (Vereist token)
+    // 1. BEHEERDERS ENDPOINTS (Via query param ?action=admin_... OF pad bevat 'admin')
     // ------------------------------------------------------------------------
-    if (fullPath.includes("admin")) {
+    if (action.startsWith("admin") || fullPath.includes("admin")) {
       if (token !== ADMIN_PASSWORD) {
         return { 
           statusCode: 401, 
@@ -48,7 +53,7 @@ exports.handler = async (event) => {
       }
 
       // D. Gebruikers importeren (Upsert: bestaande data blijft volledig behouden)
-      if (event.httpMethod === "POST" && fullPath.includes("import-users")) {
+      if (event.httpMethod === "POST" && (action === "admin_import_users" || fullPath.includes("import-users"))) {
         const { users } = JSON.parse(event.body);
         if (!Array.isArray(users) || users.length === 0) {
           return { statusCode: 400, headers, body: JSON.stringify({ error: "Geen data aangeleverd" }) };
@@ -73,37 +78,35 @@ exports.handler = async (event) => {
       }
 
       // E. Alle submissions ophalen
-      if (event.httpMethod === "GET" && fullPath.includes("submissions")) {
+      if (event.httpMethod === "GET") {
         const submissions = await submissionsCol.find({}).sort({ timestamp: -1 }).toArray();
         return { statusCode: 200, headers, body: JSON.stringify(submissions) };
       }
 
       // F. WISMOGELIJKHEDEN (DELETE)
       if (event.httpMethod === "DELETE") {
-        const urlParams = event.queryStringParameters || {};
-
-        if (urlParams.id) {
+        if (params.id) {
           let filter = {};
           try {
-            filter = { _id: new ObjectId(urlParams.id) };
+            filter = { _id: new ObjectId(params.id) };
           } catch(e) {
-            filter = { id: urlParams.id };
+            filter = { id: params.id };
           }
           const res = await submissionsCol.deleteOne(filter);
           return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
         }
 
-        if (urlParams.section && urlParams.section !== "ALL") {
-          const res = await submissionsCol.deleteMany({ section: urlParams.section });
+        if (params.section && params.section !== "ALL") {
+          const res = await submissionsCol.deleteMany({ section: params.section });
           return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
         }
 
-        if (urlParams.clearUsers === "true") {
+        if (params.clearUsers === "true") {
           const res = await usersCol.deleteMany({});
           return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
         }
 
-        if (urlParams.allSubmissions === "true") {
+        if (params.allSubmissions === "true") {
           const res = await submissionsCol.deleteMany({});
           return { statusCode: 200, headers, body: JSON.stringify({ success: true, deletedCount: res.deletedCount }) };
         }
@@ -116,14 +119,19 @@ exports.handler = async (event) => {
     // 2. REGULIERE GEBRUIKERS ENDPOINTS
     // ------------------------------------------------------------------------
 
-    if (event.httpMethod === "GET" && fullPath.includes("users")) {
+    // A. Gebruikerslijst ophalen
+    if (event.httpMethod === "GET" && (action === "users" || fullPath.includes("users"))) {
       const users = await usersCol.find({}, { projection: { user: 1, studentId: 1, section: 1 } }).toArray();
       return { statusCode: 200, headers, body: JSON.stringify(users) };
     }
 
-    if (event.httpMethod === "GET" && fullPath.includes("user-history")) {
-      const parts = fullPath.split("/");
-      const studentId = decodeURIComponent(parts[parts.length - 1]);
+    // B. Gebruikershistoriek ophalen
+    if (event.httpMethod === "GET" && (action === "user-history" || fullPath.includes("user-history"))) {
+      let studentId = params.studentId;
+      if (!studentId) {
+        const parts = fullPath.split("/");
+        studentId = decodeURIComponent(parts[parts.length - 1]);
+      }
       const history = await submissionsCol.find({ studentId }).sort({ timestamp: -1 }).toArray();
       return { statusCode: 200, headers, body: JSON.stringify(history) };
     }
@@ -142,10 +150,10 @@ exports.handler = async (event) => {
         studentId: data.studentId,
         userName: userExists.user,
         section: userExists.section,
-        testType: data.testType, // 'FL' of 'FC'
+        testType: data.testType,
         scores: data.scores,
         reverseScores: data.reverseScores || null,
-        answers: data.answers || {}, // Individuele item-antwoorden voor validatie-analyse
+        answers: data.answers || {},
         timestamp: now.toISOString(),
         dateStr: now.toLocaleDateString("nl-NL"),
         timeStr: now.toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" })
@@ -153,6 +161,12 @@ exports.handler = async (event) => {
 
       const res = await submissionsCol.insertOne(document);
       return { statusCode: 201, headers, body: JSON.stringify({ success: true, id: res.insertedId, ...document }) };
+    }
+
+    // Default fallback bij GET zonder parameters: geef de gebruikerslijst terug
+    if (event.httpMethod === "GET") {
+      const users = await usersCol.find({}, { projection: { user: 1, studentId: 1, section: 1 } }).toArray();
+      return { statusCode: 200, headers, body: JSON.stringify(users) };
     }
 
     return { statusCode: 404, headers, body: JSON.stringify({ error: "Route niet gevonden: " + fullPath }) };
